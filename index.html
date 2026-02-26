@@ -10,7 +10,11 @@
                 margin-top:-25px;
                 text-shadow: -1px -1px 0 #93d7ff, 1px -1px 0 #bef7ff, -1px 1px 0 #78d9ff, 1px 1px 0 #d3d3d3;
             }
-
+            .p{
+                text-align: bottom;
+                font-size: 20px;
+                margin-top:15px;
+            }
             .lefttext{
                 text-align: left;
                 color: rgb(0, 0, 0);
@@ -34,6 +38,15 @@
                 margin-top:-30px;
                 
             }
+            .hottext{
+                text-align: center;
+                color: rgb(19, 83, 121);
+                font-family: 'Trebuchet MS', sans-serif;
+                font-size: 30px;
+                margin:0;
+                margin-top:10px;
+                
+            }
             .icon{
                 width: 30px;
                 height: 30px;
@@ -51,7 +64,7 @@
                 display:block;
                 margin:auto;
             }
-            div {
+            .inner {
                 width: 800px;
                 height: 600px;
                 background-color: rgb(143, 211, 231);
@@ -61,9 +74,11 @@
                 display:block;
                 margin-left:-25px;
                 margin-top:-25px;
+                
             }
             p{
                 margin-left: -15px;
+                font-family: 'Trebuchet MS', sans-serif;
             }
             .textbox {
                 width: 250px;
@@ -75,14 +90,100 @@
                 display:block;
                 margin-left:-25px;
             }
+            .textboxsmall {
+                width: 350px;
+                height: 100px;
+                background-color: rgb(117, 184, 204);
+                margin: 20px;
+                border-radius: 20px;
+                display:flex;
+                margin-left:-25px;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+            }
+            .slider{
+                width: 300px;
+                height: 9px;
+                background-color: rgb(41, 48, 49);
+                padding: 1px;
+                margin: auto;
+                border-radius: 20px;
+                display:flex;
+                margin-left: middle;
+                margin-top: 0px;
+                position: relative;
+            }
+            .sliderfat{
+                width: 300px;
+                height: 10px;
+                background-color: rgb(11, 20, 22);
+                padding: 4px;
+                margin: auto;
+                border-radius: 20px;
+                display:flex;
+                margin-left: middle;
+                margin-top: 10px;
+                position: relative;
+            }
+            .ball{
+                width: 30px;
+                height: 30px;
+                background-color: rgb(180, 0, 0);
+                border-radius: 50%;
+                position: absolute;
+                display:flex;
+                top: 50%;
+                left: 250;
+                transform: translateY(-50%);
+                justify-content: right;
+                align-items: center;
+            }
+
+            button{
+                background-color: rgb(125, 193, 202);
+                width: 200px;
+                height: 50px;
+                font-size: 20px;
+                border: none;
+                border-radius: 10px;
+                outline: none;
+                box-shadow: none;
+                appearance: none;
+            }
+
+            button:hover{
+                transition: background-color 0.2s ease;
+                background-color: rgb(95, 163, 172);
+                width: 200px;
+                height: 50px;
+                font-size: 20px;
+                border: none;
+                border-radius: 10px;
+                outline: none;
+                box-shadow: none;
+                appearance: none;
+            }
+
+            button:active{
+                background-color: rgb(84, 131, 138);
+                width: 220px;
+                height: 60px;
+                font-size: 20px;
+                border: none;
+                border-radius: 10px;
+                outline: none;
+                box-shadow: none;
+                appearance: none;
+            }
         </style>
     <div class="out">
-        <div>
+        <div class="inner">
             <body style="background-color: #b1daf5;"></body>
             <h1>Native</h1>
             <h1 class="about">ABOUT ME</h1>
             <div class="textbox">
-                <h1 class="languages">languages I know</h1>
+                <h1 class="languages">Languages I know</h1>
                 <img class="icon" src="./assets/py.webp"alt="py"style="display:block; margin:auto;">
                 <p class="lefttext">⠀python</p>
                 <img class="icon" src="./assets/html.png"alt="py"style="display:block; margin:auto;">
@@ -90,7 +191,33 @@
                 <img class="icon" src="./assets/css.png"alt="py"style="display:block; margin:auto;">
                 <p class="lefttext">⠀css</p>
             </div>
-        </div>
+            <div class="textbox" style=margin-left:475px;margin-top:-245px;>
+                <h1 class="languages">Strengths</h1>
+                <p class="p" style="font-size: 15px;">I do api stuff and i hack games<br><br>I like messing with apps and games<br><br>I code
+                </p>
+            </div>
+            <div class="textbox" style=margin-left:475px;>
+                <h1 class="languages">Stuff I have done</h1>
+                <p class="p" style="font-size: 15px;">I breached yeep's api to get myself items, currency, player data and track players in-game, I relayed this info to the devs and got it fixed
+                </p>
+            </div>
+            <div class="textboxsmall" style="margin-top:-125px;">
+                <button onclick="window.location.href='https://native.beer/yeepstracker'">
+                    free fortnite cheats
+                </button>
+            </div>
+            <div class="textboxsmall"style="margin-top:-245px;">
+                <h1 class="hottext">hotness meter</h1>
+                <div class="sliderfat">
+                    <div class="slider">
+                        <div class="ball">
+                            <p class="p">🔥</p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
     </div>
     </head>
     </html>
