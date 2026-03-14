@@ -127,8 +127,40 @@ background:#3a7afe;
 color:white;
 cursor:pointer;
 z-index:10;
+transition:0.2s;
+height: fit-content;
+width: fit-content;
 }
 
+.themeToggle:hover{
+position:fixed;
+top:15px;
+left:15px;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+background:#2c62cf;
+color:white;
+cursor:pointer;
+z-index:10;
+transition:0.2s;
+font-size:15px;
+}
+
+.themeToggle:active{
+position:fixed;
+top:15px;
+left:15px;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+background:#183a7e;
+color:white;
+cursor:pointer;
+z-index:10;
+transition:0.2s;
+font-size:13px;
+}
 /* SEARCH */
 
 .searchBox{
@@ -299,13 +331,35 @@ transition:0.15s;
     scale:106%;
     transform: translateY(-2);
 }
+.redtext{
+    color:#c70000;
+}
+
+.square button {
+    width: 60px;               /* fixed width */
+    height: 60px;              /* fixed height to match width */
+    background: #3a7afe;
+    color: white;
+    border-radius: 6px;
+    border: 3px solid #3069db;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.15s;
+    font-size:15px;
+    display: flex;             /* center text/icon */
+    align-items: center;
+    justify-content: center;
+    padding: 0;                /* remove padding to keep it square */
+    text-align: center;
+}
+
 
 </style>
 </head>
 
 <body class="dark">
 
-<button class="themeToggle" id="themeBtn">☀ Light Mode</button>
+<button class="themeToggle" id="themeBtn">Toggle theme</button>
 
 <div class="overlay" id="overlay">
 
@@ -335,14 +389,17 @@ Click to accept the disclaimer
 <header>
 <h1>Playables!</h1>
 <p class="">I am not responsible for anything that happens when you play these games.</p>
-<p class="">If you play these in a school enviroment, you may risk suspension.</p>
+<p class="">If you play these in a school enviroment, you will be at risk.</p>
 <p class="">I do not own these games. All rights belong to their owners. If you want a game taken down, email <b>admin@native.beer</b></p>
 <p class="">email <b>suggestions@native.beer</b> to suggest games to add! </p>
-<p class="" style="color:#c70000;">go to https://native.beer/work?icon=classroom to have a different tab name</p>
+<p class="redtext" id="redtext">go to https://native.beer/work?icon=classroom to have a different tab name</p>
 </header>
 
 <div class="searchBox">
+<button class = square id="clear">❌</button>
 <input id="search" placeholder="Search for games!">
+<button class = square id="pcbutton">💻</button>
+<button class = square id="tabletbutton">📱</button>
 </div>
 
 <div class="count" id="count"></div>
@@ -357,7 +414,6 @@ leave site quickly
 
 
 <script>
-
 /* GAME LIST */
 
 const games=[
@@ -485,7 +541,6 @@ const count=document.getElementById("count")
 
 search.addEventListener("input", () => {
     const query = search.value.toLowerCase().trim();
-
     document.querySelectorAll(".game").forEach(card => {
         const name = card.querySelector("a:last-child").innerText.toLowerCase();
         if (name.includes(query)) {
@@ -544,7 +599,8 @@ const params = new URLSearchParams(window.location.search);
 if (params.get("icon") === "classroom") {
     // Change tab title
     document.title = "Home - Classroom";
-
+    redtext.innerText='The tab is named "Home - Classroom"!'
+    redtext.style.color='#009900'
     // Change favicon
     let favicon = document.querySelector("link[rel='icon']");
     if (!favicon) {
@@ -554,6 +610,8 @@ if (params.get("icon") === "classroom") {
     }
     favicon.href = "./classroom.ico";
 }
+
+search.value=''
 
 /* DISCLAIMER ALWAYS REQUIRED */
 
@@ -590,15 +648,55 @@ btn.onclick=()=>{
 if(body.classList.contains("dark")){
 body.classList.remove("dark")
 body.classList.add("light")
-btn.innerText="🌙 Dark Mode"
 localStorage.setItem("theme","light")
 }else{
 body.classList.remove("light")
 body.classList.add("dark")
-btn.innerText="☀️ Light Mode"
 localStorage.setItem("theme","dark")
 }
 
+}
+
+pcbutton.onclick=()=>{
+search.value='💻'
+const query = search.value.toLowerCase().trim();
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+    updateCount()
+}
+
+tabletbutton.onclick=()=>{
+search.value='📱'
+const query = search.value.toLowerCase().trim();
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+    updateCount()
+}
+
+clear.onclick=()=>{
+search.value=''
+const query = search.value.toLowerCase().trim();
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+    updateCount()
 }
 
 
