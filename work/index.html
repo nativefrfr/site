@@ -53,6 +53,41 @@ body.light .game a{
 color:#222;
 }
 
+/* checkbox */
+.checkbox4{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+cursor:pointer;
+margin:auto;
+width:fit-content;
+}
+
+.checkbox4 input{
+appearance:none;
+width:22px;
+height:22px;
+border:3px solid #3a7afe;
+border-radius:4px;
+background:#86a7e9;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+transition:0.2s;
+}
+
+.checkbox4 input:checked{
+background:#3a7afe;
+}
+
+.checkbox4 input:checked::after{
+content:"✔";
+color:white;
+font-size:14px;
+}
+
 
 /* HEADER */
 
@@ -80,7 +115,7 @@ z-index:10;
 
 .searchBox{
 text-align:center;
-margin:20px;
+margin:30px;
 }
 
 .searchBox input{
@@ -97,6 +132,22 @@ font-size:16px;
 text-align:center;
 margin-bottom:10px;
 opacity:0.8;
+font-weight:600;
+font-size:18px;
+overflow:hidden;
+height:24px;
+}
+
+.count span{
+display:inline-block;
+transform:translateY(10px);
+opacity:0;
+transition:transform 0.18s ease, opacity 0.18s ease;
+}
+
+.count span.show{
+transform:translateY(0);
+opacity:1;
 }
 
 /* GRID */
@@ -115,18 +166,28 @@ border-radius:10px;
 overflow:hidden;
 box-shadow:0 4px 10px rgba(0,0,0,0.2);
 transition:0.15s;
+white-space: 10px;
+height:auto;
 }
 
 .game:hover{
-transform:translateY(-4px);
+transform:translateY(-6px);
+box-shadow:0 4px 10px rgba(112, 142, 146, 0.2);
 }
 
 .game img{
 width:100%;
 height:120px;
 object-fit:cover;
+transition:0.15s;
 }
 
+.game img:hover{
+width:100%;
+height:120px;
+object-fit:cover;
+transition:0.15s;
+}
 .game a{
 display:block;
 padding:10px;
@@ -147,9 +208,10 @@ z-index:999;
 }
 
 .disclaimer{
-background:rgb(133, 124, 124);
+background:rgb(223, 59, 59);
 padding:30px;
 border-radius:10px;
+border: 5px solid #9e0000;
 max-width:550px;
 text-align:center;
 }
@@ -161,12 +223,29 @@ border:none;
 background:#3a7afe;
 color:white;
 border-radius:6px;
+border: 3px solid #3069db;
 font-size:16px;
 cursor:pointer;
+transition:0.15s;
+}
+
+.disclaimer button:hover{
+margin-top:15px;
+padding:10px 20px;
+border:none;
+background:#2c62cf;
+color:white;
+border-radius:6px;
+border: 3px solid #2456bb;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
 }
 
 .disclaimer button:disabled{
 background:#aaa;
+border-radius:6px;
+border: 3px solid #979797;
 }
 
 /* BOTTOM BUTTON */
@@ -174,8 +253,8 @@ background:#aaa;
 .classroomBtn{
 position:fixed;
 bottom:0;
-left:0;
-width:100%;
+right:0;
+width:20%;
 background:#b15151;
 color:white;
 text-align:center;
@@ -183,11 +262,24 @@ padding:14px;
 font-weight:bold;
 cursor:pointer;
 z-index:50;
+border-radius: 5px;
 }
 
+
 .classroomBtn:hover{
-    
 background:#7a0303;
+transition:0.15s;
+}
+
+.img{
+    border-radius: 10px;
+    scale:105%;
+    transform: translateY(-2);
+}
+.img:hover{
+    border-radius: 5px;
+    scale:106%;
+    transform: translateY(-2);
 }
 
 </style>
@@ -201,16 +293,18 @@ background:#7a0303;
 
 <div class="disclaimer">
 
-<h2 style="color: #680000;">Disclaimer</h2>
+<h2 style="color: #680000;">⚠️ Disclaimer! ⚠️</h2>
 
 <p style="color: #000000;">I am not responsible for anything that happens when you play these games.</p>
-<p style="color: #000000;">If you play these in a school enviroment, you may risk suspension.</p>
-<p style="color: #000000;">I do not own these games. All rights belong to their owners.</p>
+<p style="color: #000000;">If you play these in a school enviroment, you will be at risk.</p>
+<p style="color: #000000;">I do not own these games. All rights belong to their respective owners. If you want a game taken down, email <b>admin@native.beer</b></p>
 
-<label>
+<label class="checkbox4">
 <input type="checkbox" id="agree">
-I understand and accept this disclaimer
+Click to accept the disclaimer
 </label>
+
+<p style="font-size: 10px; color: #4d4d4d">*you will have to agree every time you go onto the site</p>
 
 <br>
 
@@ -221,11 +315,15 @@ I understand and accept this disclaimer
 
 
 <header>
-<h1>Native Games</h1>
+<h1>Playables!</h1>
+<p class="">I am not responsible for anything that happens when you play these games.</p>
+<p class="">If you play these in a school enviroment, you may risk suspension.</p>
+<p class="">I do not own these games. All rights belong to their owners. If you want a game taken down, email <b>admin@native.beer</b></p>
+<p class="">email <b>suggestions@native.beer</b> to suggest games to add! </p>
 </header>
 
 <div class="searchBox">
-<input id="search" placeholder="Search games...">
+<input id="search" placeholder="Search for games!">
 </div>
 
 <div class="count" id="count"></div>
@@ -245,87 +343,98 @@ leave site quickly
 
 const games=[
 
-["fnaf","fivenights"],
-["bitlife","bit"],
-["ultrakill","ultra"],
-["granny","gran"],
-["crazycattle","crazy"],
-["doom","doom"],
-["happywheels","happywheels"],
-["hollowknight","hk"],
-["omori","omori"],
-["peggle","peggle"],
-["pvz","pvz"],
-["pvz2","pvz2"],
-["raft","raft"],
-["repo","repo"],
-["slimerancher","slime"],
-["bindingofisaac","tboi"],
-["terraria","ter"],
-["thatsnotmyneighbor","tnmn"],
-["1v1lol","1v1lol"],
-["8ballbilliards","8ballbillards"],
-["angrybirds","angrybirds"],
-["attackhole","attackhole"],
-["backrooms","backrooms"],
-["baldi","baldi"],
-["basketball","basketball"],
-["basketrandom","basketrandom"],
-["blockblast","blockblast"],
-["bottlejump","bottlejump"],
-["bowmasters","bowmasters"],
-["boxingrandom","boxingrandom"],
-["clusterrush","clusterrush"],
-["colourmatch","colourmatch"],
-["crossyroad","crossyroad"],
-["customnight","customnight"],
-["cuttherope","cuttherope"],
-["digdeep","digdeep"],
-["drawclimber","drawclimber"],
-["drivewild","drivienwild"],
-["emulator","emulator"],
-
-["fireboywatergirl","fireboywatergirl"],
-["fireboywatergirl3","fireboywatergirl3"],
-["flappybirdmulti","flappybirdmulti"],
-["flappydunk","flappydunk"],
-["fnaf1","fnaf1"],
-["fnaf2","fnaf2"],
-["fnaf3","fnaf3"],
-["fnaf4","fnaf4"],
-["fnf","fnf"],
-["forknsausage","forknsausage"],
-["geometrydash","geometrydash"],
-["gladihoppers","gladihoppers"],
-["gobble","gobble"],
-["gunspin","gunspin"],
-["highwayracer","highwayracer"],
-["hook","hook"],
-["icedodo","icedodo"],
-["jetpackjoyride","jetpackjoyride"],
-["magictiles","magictiles"],
-["mobcontrol","mobcontrol"],
-["monstertracks","monstertracks"],
-["motox3m2","motox3m2"],
-["motox3m3","motox3m3"],
-["motox3m6","motox3m6"],
-["osu","osu"],
-["ovo","ovo"],
-["ovo2","ovo2"],
-["ovod","ovod"],
-["pou","pou"],
-["ragdollhit","ragdollhit"],
-["retrobowl","retrobowl"],
-["retrobowlc","retrobowlc"],
-["roadoffury","roadoffury"],
-["sprunki","sprunki"],
-["td2","td2"],
-["td4","td4"],
-["templerun","templerun"],
-["watersort","watersort"],
-["wave","wave"],
-["wordle","wordle"]
-
+["bitlife📱+💻","bit"],
+["ultrakill📱+💻","ultra"],
+["granny📱+💻","gran"],
+["crazy cattle 💻","crazy"],
+["doom 💻","doom"],
+["happy wheels 💻","happywheels"],
+["hollow knight 💻","hk"],
+["omori💻","omori"],
+["peggle 📱+💻","peggle"],
+["pvz📱+💻","pvz"],
+["pvz2💻","pvz2"],
+["raft📱+💻","raft"],
+["repo 💻","repo"],
+["slime rancher 💻","slime"],
+["the binding of isaac 💻","tboi"],
+["terraria 💻","ter"],
+["thats not my neighbor💻","tnmn"],
+["1v1.lol💻","1v1lol"],
+["8ball billiards 📱+💻","8ballbillards"],
+["angry birds📱+💻","angrybirds"],
+["attack hole📱+💻","attackhole"],
+["backrooms ❔","backrooms"],
+["baldi 📱+💻","baldi"],
+["basketball ❔","basketball"],
+["basket random 📱+💻","basketrandom"],
+["blockblast 📱+💻","blockblast"],
+["bottle jump 📱+💻","bottlejump"],
+["bowmasters 📱+💻","bowmasters"],
+["boxing random 📱+💻","boxingrandom"],
+["cluster rush 📱+💻","clusterrush"],
+["colour match 📱+💻","colourmatch"],
+["crossy road 📱+💻","crossyroad"],
+["ultimate custom night (fnaf) 📱+💻","customnight"],
+["cut the rope 📱+💻","cuttherope"],
+["dig deep 📱+💻","digdeep"],
+["draw climber 📱+💻","drawclimber"],
+["driven wild 📱+💻","drivienwild"],
+["emulator ❔","emulator"],
+["celeste 💻","celeste"],
+["fireboy and water girl 📱+💻","fireboywatergirl"],
+["fireboy and water girl 3 📱+💻","fireboywatergirl3"],
+["flappy bird multiplayer 📱+💻","flappybirdmulti"],
+["flappy dunk 📱+💻","flappydunk"],
+["fnaf 1 📱+💻","fnaf1"],
+["fnaf 2 📱+💻","fnaf2"],
+["fnaf 3 📱+💻","fnaf3"],
+["fnaf 4 📱+💻","fnaf4"],
+["friday night funkin 📱+💻","fnf"],
+["fork n sausage 📱+💻","forknsausage"],
+["geometry dash 📱+💻","geometrydash"],
+["gladihoppers ❔","gladihoppers"],
+["gobble ❔ ","gobble"],
+["gunspin 📱+💻","gunspin"],
+["highway racer 📱+💻","highwayracer"],
+["hook ❔","hook"],
+["icedodo ❔","icedodo"],
+["jetpackjoyride 📱+💻","jetpackjoyride"],
+["magic tiles 📱+💻","magictiles"],
+["mobcontrol 📱+💻","mobcontrol"],
+["monster tracks 📱+💻","monstertracks"],
+["moto X3M 2 📱+💻","motox3m2"],
+["moto X3M 3 📱+💻","motox3m3"],
+["moto X3M 6 📱+💻","motox3m6"],
+["osu 📱+💻","osu"],
+["ovo 📱+💻","ovo"],
+["ovo 2 📱+💻","ovo2"],
+["ovo dimensions 📱+💻","ovod"],
+["pou 📱+💻","pou"],
+["ragdoll hit 📱+💻","ragdollhit"],
+["retro bowl 📱+💻","retrobowl"],
+["retro bowl college 📱+💻","retrobowlc"],
+["road of fury 📱+💻","roadoffury"],
+["sprunki 📱+💻","sprunki"],
+["bloons tower defense 2 📱+💻","td2"],
+["bloons tower defense 4 📱+💻","td4"],
+["temple run 📱+💻","templerun"],
+["water sort 📱+💻","watersort"],
+["wave 📱+💻","wave"],
+["wordle 📱+💻","wordle"],
+["bad piggies 📱+💻","badpiggies"],
+["fruit ninja 📱+💻","fruitninja"],
+["grow a garden 📱+💻","growagarden"],
+["halflife 💻","halflife"],
+["oneshot 📱+💻","oneshot"],
+["slither.io 📱+💻","slither"],
+["slope 📱+💻","slope"],
+["solar smash 📱+💻","solarsmash"],
+["steal a brainrot 📱+💻","stealabrainrot"],
+["steal a brainrot (ONLINE) 📱+💻","stealabrainrotonline"],
+["worldbox 📱+💻","worldbox"],
+["cookie clicker 💻", "cookie"],
+["buckshot roulette 💻", "buckshot"]
 ]
 
 
@@ -339,7 +448,7 @@ const card=document.createElement("div")
 card.className="game"
 
 card.innerHTML=`
-<img src="./assets/${g[0]}.png">
+<a href="https://native.beer/work/${g[1]}"><img src="./assets/${g[1]}.png" class="img"></a>
 <a href="https://native.beer/work/${g[1]}">${g[0]}</a>
 `
 
@@ -353,28 +462,41 @@ container.appendChild(card)
 const search=document.getElementById("search")
 const count=document.getElementById("count")
 
+let currentCount = 0
+let animating = false
+
+function animateCount(target){
+
+if(animating) return
+animating = true
+
+const speed = 10
+const step = Math.max(1, Math.ceil((target - currentCount) / 100))
+
+const interval = setInterval(()=>{
+
+currentCount += step
+
+if(currentCount >= target){
+currentCount = target
+clearInterval(interval)
+animating = false
+}
+
+count.innerHTML = `<span class="show">${currentCount} games</span>`
+
+}, speed)
+
+}
+
 function updateCount(){
-let visible=0
+let visible = 0
+
 document.querySelectorAll(".game").forEach(g=>{
 if(g.style.display!="none") visible++
 })
-count.innerText=visible+" games"
-}
 
-search.onkeyup=()=>{
-let v=search.value.toLowerCase()
-
-document.querySelectorAll(".game").forEach(g=>{
-let name=g.innerText.toLowerCase()
-
-if(name.includes(v)){
-g.style.display="block"
-}else{
-g.style.display="none"
-}
-})
-
-updateCount()
+animateCount(visible)
 }
 
 updateCount()
