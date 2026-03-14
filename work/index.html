@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html>
+      <title>native games!</title>
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
 <head>
 <meta charset="UTF-8">
 
@@ -29,6 +31,14 @@ body.dark .game{
 background:#1a1d24;
 }
 
+body.dark .game:hover{
+background:#323846;
+}
+
+body.dark .game:active{
+background:#2456bb;
+}
+
 body.dark .game a{
 color:white;
 }
@@ -47,6 +57,14 @@ border-bottom:1px solid #ddd;
 
 body.light .game{
 background:white;
+}
+
+body.light .game:hover{
+background:rgb(160, 160, 160);
+}
+
+body.light .game:active{
+background: #7faaff;
 }
 
 body.light .game a{
@@ -320,6 +338,7 @@ Click to accept the disclaimer
 <p class="">If you play these in a school enviroment, you may risk suspension.</p>
 <p class="">I do not own these games. All rights belong to their owners. If you want a game taken down, email <b>admin@native.beer</b></p>
 <p class="">email <b>suggestions@native.beer</b> to suggest games to add! </p>
+<p class="" style="color:#c70000;">go to https://native.beer/work?icon=classroom to have a different tab name</p>
 </header>
 
 <div class="searchBox">
@@ -462,6 +481,23 @@ container.appendChild(card)
 const search=document.getElementById("search")
 const count=document.getElementById("count")
 
+/* SEARCH FILTER */
+
+search.addEventListener("input", () => {
+    const query = search.value.toLowerCase().trim();
+
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    updateCount(); // Update the visible game count
+});
+
 let currentCount = 0
 let animating = false
 
@@ -470,7 +506,7 @@ function animateCount(target){
 if(animating) return
 animating = true
 
-const speed = 10
+const speed = 1
 const step = Math.max(1, Math.ceil((target - currentCount) / 100))
 
 const interval = setInterval(()=>{
@@ -501,7 +537,23 @@ animateCount(visible)
 
 updateCount()
 
+/* CHANGE TAB FOR ?icon=classroom */
 
+const params = new URLSearchParams(window.location.search);
+
+if (params.get("icon") === "classroom") {
+    // Change tab title
+    document.title = "Home - Classroom";
+
+    // Change favicon
+    let favicon = document.querySelector("link[rel='icon']");
+    if (!favicon) {
+        favicon = document.createElement("link");
+        favicon.rel = "icon";
+        document.head.appendChild(favicon);
+    }
+    favicon.href = "./classroom.ico";
+}
 
 /* DISCLAIMER ALWAYS REQUIRED */
 
@@ -543,7 +595,7 @@ localStorage.setItem("theme","light")
 }else{
 body.classList.remove("light")
 body.classList.add("dark")
-btn.innerText="☀ Light Mode"
+btn.innerText="☀️ Light Mode"
 localStorage.setItem("theme","dark")
 }
 
