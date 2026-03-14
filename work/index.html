@@ -250,20 +250,23 @@ font-weight:600;
 .overlay{
 position:fixed;
 inset:0;
-background:rgba(0,0,0,0.7);
+background:rgba(0, 0, 0, 0.9);
 display:flex;
 justify-content:center;
 align-items:center;
 z-index:999;
+transition: 0.2s;
 }
 
 .disclaimer{
-background:rgb(223, 59, 59);
+background:rgba(223, 59, 59, 1);
 padding:30px;
 border-radius:10px;
-border: 5px solid #9e0000;
+border: 5px solid rgba(138, 0, 0,1);
+display: block;
 max-width:550px;
 text-align:center;
+transition: 0.2s;
 }
 
 .disclaimer button{
@@ -363,7 +366,7 @@ transition:0.15s;
 
 <div class="overlay" id="overlay">
 
-<div class="disclaimer">
+<div class="disclaimer" id="disclaimer">
 
 <h2 style="color: #680000;">⚠️ Disclaimer! ⚠️</h2>
 
@@ -630,11 +633,22 @@ agree.onchange=()=>{
     enter.disabled=!agree.checked
 }
 
-enter.onclick=()=>{
-    overlay.style.display="none"
-    agree.checked = false // reset checkbox for next visit
-    enter.disabled = true
-}
+enter.onclick = () => {
+    // Start the fade
+    overlay.style.background = "rgba(0, 0, 0, 0)";
+    disclaimer.style.background = "rgba(223, 59, 59, 0)";
+    disclaimer.style.border = "5px solid rgba(138, 0, 0,0)";
+    agree.checked = false;
+    enter.disabled = true;
+
+    // Wait for the transition to finish before hiding
+    overlay.addEventListener('transitionend', function handler() {
+        overlay.style.display = "none";
+        disclaimer.style.display = "none";
+        overlay.removeEventListener('transitionend', handler);
+    });
+};
+
 
 
 /* THEME */
@@ -705,8 +719,8 @@ const query = search.value.toLowerCase().trim();
 
 
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
-     crossorigin="anonymous"></script>
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
+     crossorigin="anonymous"></script> -->
 </body>
 
 </html>
