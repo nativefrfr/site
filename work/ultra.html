@@ -156,6 +156,112 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
      crossorigin="anonymous"></script>
 
+<script>
+let prevButtons = {};
+
+function sendKey(key, type){
+    document.dispatchEvent(new KeyboardEvent(type,{
+        key:key,
+        code:key,
+        bubbles:true
+    }));
+}
+
+function mouseMove(dx,dy){
+    const canvas = document.getElementById("unity-canvas");
+    canvas.dispatchEvent(new MouseEvent("mousemove",{
+        movementX:dx,
+        movementY:dy,
+        bubbles:true
+    }));
+}
+
+function mouseClick(button,type){
+    const canvas = document.getElementById("unity-canvas");
+    canvas.dispatchEvent(new MouseEvent(type,{
+        button:button,
+        bubbles:true
+    }));
+}
+
+function scroll(amount){
+    window.dispatchEvent(new WheelEvent("wheel",{deltaY:amount}));
+}
+
+function gamepadLoop(){
+    const gp = navigator.getGamepads()[0];
+    if(!gp){
+        requestAnimationFrame(gamepadLoop);
+        return;
+    }
+
+    /* LEFT STICK → MOUSE */
+    let mx = gp.axes[0];
+    let my = gp.axes[1];
+
+    if(Math.abs(mx) > 0.1 || Math.abs(my) > 0.1){
+        mouseMove(mx*20,my*20);
+    }
+
+    /* RIGHT STICK → WASD */
+    let rx = gp.axes[2];
+    let ry = gp.axes[3];
+
+    function axisKey(val,pos,neg,keyPos,keyNeg){
+        if(val > pos) sendKey(keyPos,"keydown");
+        else sendKey(keyPos,"keyup");
+
+        if(val < neg) sendKey(keyNeg,"keydown");
+        else sendKey(keyNeg,"keyup");
+    }
+
+    axisKey(rx,0.4,-0.4,"d","a");
+    axisKey(ry,0.4,-0.4,"s","w");
+
+    const map = {
+        7:["mouse",0],   // RT left click
+        6:["mouse",2],   // LT right click
+        5:["scroll",-120], // RB scroll up
+        4:["scroll",120],  // LB scroll down
+        0:["key"," "],   // A space
+        2:["key","f"],   // X / square
+        3:["key","e"],   // Y / triangle
+        11:["key","Shift"], // right stick press
+        10:["key","Control"] // left stick press
+    };
+
+    gp.buttons.forEach((btn,i)=>{
+        if(!map[i]) return;
+
+        let pressed = btn.pressed;
+        let prev = prevButtons[i];
+
+        if(pressed && !prev){
+            let action = map[i];
+
+            if(action[0]=="mouse") mouseClick(action[1],"mousedown");
+            if(action[0]=="scroll") scroll(action[1]);
+            if(action[0]=="key") sendKey(action[1],"keydown");
+        }
+
+        if(!pressed && prev){
+            let action = map[i];
+
+            if(action[0]=="mouse") mouseClick(action[1],"mouseup");
+            if(action[0]=="key") sendKey(action[1],"keyup");
+        }
+
+        prevButtons[i] = pressed;
+    });
+
+    requestAnimationFrame(gamepadLoop);
+}
+
+window.addEventListener("gamepadconnected",()=>{
+    console.log("Controller connected");
+    gamepadLoop();
+});
+</script>
 </body>
 
 </html>
