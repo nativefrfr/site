@@ -1,43 +1,107 @@
-import os
+# Your list of games
+games = [
+    ["bitlife📱+💻","bit"],
+    ["ultrakill📱+💻","ultra"],
+    ["granny📱+💻","gran"],
+    ["crazy cattle 💻","crazy"],
+    ["doom 💻","doom"],
+    ["happy wheels 💻","happywheels"],
+    ["hollow knight 💻","hk"],
+    ["omori💻","omori"],
+    ["peggle 📱+💻","peggle"],
+    ["pvz📱+💻","pvz"],
+    ["pvz2💻","pvz2"],
+    ["raft📱+💻","raft"],
+    ["repo 💻","repo"],
+    ["slime rancher 💻","slime"],
+    ["the binding of isaac 💻","tboi"],
+    ["terraria 💻","ter"],
+    ["thats not my neighbor💻","tnmn"],
+    ["1v1.lol💻","1v1lol"],
+    ["8ball billiards 📱+💻","8ballbillards"],
+    ["angry birds📱+💻","angrybirds"],
+    ["attack hole📱+💻","attackhole"],
+    ["backrooms ❔","backrooms"],
+    ["baldi 📱+💻","baldi"],
+    ["basketball ❔","basketball"],
+    ["basket random 📱+💻","basketrandom"],
+    ["blockblast 📱+💻","blockblast"],
+    ["bottle jump 📱+💻","bottlejump"],
+    ["bowmasters 📱+💻","bowmasters"],
+    ["boxing random 📱+💻","boxingrandom"],
+    ["cluster rush 📱+💻","clusterrush"],
+    ["colour match 📱+💻","colourmatch"],
+    ["crossy road 📱+💻","crossyroad"],
+    ["ultimate custom night (fnaf) 📱+💻","customnight"],
+    ["cut the rope 📱+💻","cuttherope"],
+    ["dig deep 📱+💻","digdeep"],
+    ["draw climber 📱+💻","drawclimber"],
+    ["driven wild 📱+💻","drivienwild"],
+    ["emulator ❔","emulator"],
+    ["celeste 💻","celeste"],
+    ["fireboy and water girl 📱+💻","fireboywatergirl"],
+    ["fireboy and water girl 3 📱+💻","fireboywatergirl3"],
+    ["flappy bird multiplayer 📱+💻","flappybirdmulti"],
+    ["flappy dunk 📱+💻","flappydunk"],
+    ["fnaf 1 📱+💻","fnaf1"],
+    ["fnaf 2 📱+💻","fnaf2"],
+    ["fnaf 3 📱+💻","fnaf3"],
+    ["fnaf 4 📱+💻","fnaf4"],
+    ["friday night funkin 📱+💻","fnf"],
+    ["fork n sausage 📱+💻","forknsausage"],
+    ["geometry dash 📱+💻","geometrydash"],
+    ["gladihoppers ❔","gladihoppers"],
+    ["gobble ❔ ","gobble"],
+    ["gunspin 📱+💻","gunspin"],
+    ["highway racer 📱+💻","highwayracer"],
+    ["hook ❔","hook"],
+    ["icedodo ❔","icedodo"],
+    ["jetpackjoyride 📱+💻","jetpackjoyride"],
+    ["magic tiles 📱+💻","magictiles"],
+    ["mobcontrol 📱+💻","mobcontrol"],
+    ["monster tracks 📱+💻","monstertracks"],
+    ["moto X3M 2 📱+💻","motox3m2"],
+    ["moto X3M 3 📱+💻","motox3m3"],
+    ["moto X3M 6 📱+💻","motox3m6"],
+    ["osu 📱+💻","osu"],
+    ["ovo 📱+💻","ovo"],
+    ["ovo 2 📱+💻","ovo2"],
+    ["ovo dimensions 📱+💻","ovod"],
+    ["pou 📱+💻","pou"],
+    ["ragdoll hit 📱+💻","ragdollhit"],
+    ["retro bowl 📱+💻","retrobowl"],
+    ["retro bowl college 📱+💻","retrobowlc"],
+    ["road of fury 📱+💻","roadoffury"],
+    ["sprunki 📱+💻","sprunki"],
+    ["bloons tower defense 2 📱+💻","td2"],
+    ["bloons tower defense 4 📱+💻","td4"],
+    ["temple run 📱+💻","templerun"],
+    ["water sort 📱+💻","watersort"],
+    ["wave 📱+💻","wave"],
+    ["wordle 📱+💻","wordle"],
+    ["bad piggies 📱+💻","badpiggies"],
+    ["fruit ninja 📱+💻","fruitninja"],
+    ["grow a garden 📱+💻","growagarden"],
+    ["halflife 💻","halflife"],
+    ["oneshot 📱+💻","oneshot"],
+    ["slither.io 📱+💻","slither"],
+    ["slope 📱+💻","slope"],
+    ["solar smash 📱+💻","solarsmash"],
+    ["steal a brainrot 📱+💻","stealabrainrot"],
+    ["steal a brainrot (ONLINE) 📱+💻","stealabrainrotonline"],
+    ["worldbox 📱+💻","worldbox"],
+    ["cookie clicker 💻", "cookie"],
+    ["buckshot roulette 💻", "buckshot"],
+    ["soundboard 📱+💻", "soundboard"],
+    ["survivor.io📱+💻", "survivorio"],
+    ["pixel gun survival 📱+💻","pixelgun"],
+    ["A Difficult Game About Climbing 📱+💻", "adgac"],
+    ["jellydrift 📱+💻","jellydrift"]
+]
 
-FOLDER = "."
+# Sort alphabetically by the first element (case-insensitive)
+games.sort(key=lambda x: x[0].lower())
 
-ADSENSE_CODE = """
-<!-- Google AdSense -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
-     crossorigin="anonymous"></script>
-"""
-
-for root, dirs, files in os.walk(FOLDER):
-    for file in files:
-        if not file.endswith(".html"):
-            continue
-
-        if file.lower() == "index.html":
-            continue
-
-        path = os.path.join(root, file)
-
-        try:
-            with open(path, "r", encoding="utf-8", errors="ignore") as f:
-                content = f.read()
-
-            # skip if already added
-            if "ca-pub-" in content:
-                continue
-
-            if "</body>" in content:
-                print("Adding AdSense to:", path)
-
-                new_content = content.replace(
-                    "</body>",
-                    ADSENSE_CODE + "\n</body>"
-                )
-
-                with open(path, "w", encoding="utf-8") as f:
-                    f.write(new_content)
-
-        except Exception:
-            print("Skipped:", path)
-
-print("Done.")
+# Print the sorted list
+for game in games:
+    print(game)
