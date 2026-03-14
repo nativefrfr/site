@@ -142,6 +142,7 @@
                 // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
             }).then((e) => {
                 document.querySelector("#loading-text").remove();
+                canvas.focus();
             });
         });
     </script>
@@ -157,18 +158,20 @@
      crossorigin="anonymous"></script>
 
 <script>
-let prevButtons = {};
+const canvas = document.getElementById("unity-canvas");
 
-function sendKey(key, type){
-    document.dispatchEvent(new KeyboardEvent(type,{
+let prevButtons = {};
+let deadzone = 0.15;
+
+function keyEvent(type, key, code){
+    canvas.dispatchEvent(new KeyboardEvent(type,{
         key:key,
-        code:key,
+        code:code,
         bubbles:true
     }));
 }
 
 function mouseMove(dx,dy){
-    const canvas = document.getElementById("unity-canvas");
     canvas.dispatchEvent(new MouseEvent("mousemove",{
         movementX:dx,
         movementY:dy,
@@ -176,58 +179,56 @@ function mouseMove(dx,dy){
     }));
 }
 
-function mouseClick(button,type){
-    const canvas = document.getElementById("unity-canvas");
+function mouseButton(type,button){
     canvas.dispatchEvent(new MouseEvent(type,{
         button:button,
         bubbles:true
     }));
 }
 
-function scroll(amount){
-    window.dispatchEvent(new WheelEvent("wheel",{deltaY:amount}));
+function scroll(delta){
+    canvas.dispatchEvent(new WheelEvent("wheel",{deltaY:delta}));
 }
 
-function gamepadLoop(){
+function handleAxisMovement(x,y){
+    if(Math.abs(x) < deadzone) x = 0;
+    if(Math.abs(y) < deadzone) y = 0;
+
+    keyEvent(x > 0 ? "keydown":"keyup","d","KeyD");
+    keyEvent(x < 0 ? "keydown":"keyup","a","KeyA");
+
+    keyEvent(y > 0 ? "keydown":"keyup","s","KeyS");
+    keyEvent(y < 0 ? "keydown":"keyup","w","KeyW");
+}
+
+function loop(){
     const gp = navigator.getGamepads()[0];
     if(!gp){
-        requestAnimationFrame(gamepadLoop);
+        requestAnimationFrame(loop);
         return;
     }
 
-    /* LEFT STICK → MOUSE */
-    let mx = gp.axes[0];
-    let my = gp.axes[1];
+    /* LEFT STICK → WASD */
+    handleAxisMovement(gp.axes[0], gp.axes[1]);
 
-    if(Math.abs(mx) > 0.1 || Math.abs(my) > 0.1){
-        mouseMove(mx*20,my*20);
-    }
-
-    /* RIGHT STICK → WASD */
+    /* RIGHT STICK → MOUSE CAMERA */
     let rx = gp.axes[2];
     let ry = gp.axes[3];
 
-    function axisKey(val,pos,neg,keyPos,keyNeg){
-        if(val > pos) sendKey(keyPos,"keydown");
-        else sendKey(keyPos,"keyup");
-
-        if(val < neg) sendKey(keyNeg,"keydown");
-        else sendKey(keyNeg,"keyup");
+    if(Math.abs(rx) > deadzone || Math.abs(ry) > deadzone){
+        mouseMove(rx*25, ry*25);
     }
 
-    axisKey(rx,0.4,-0.4,"d","a");
-    axisKey(ry,0.4,-0.4,"s","w");
-
     const map = {
-        7:["mouse",0],   // RT left click
-        6:["mouse",2],   // LT right click
-        5:["scroll",-120], // RB scroll up
-        4:["scroll",120],  // LB scroll down
-        0:["key"," "],   // A space
-        2:["key","f"],   // X / square
-        3:["key","e"],   // Y / triangle
-        11:["key","Shift"], // right stick press
-        10:["key","Control"] // left stick press
+        7:["mouse",0],      // RT
+        6:["mouse",2],      // LT
+        5:["scroll",-120],  // RB
+        4:["scroll",120],   // LB
+        0:["key"," ","Space"],       // A
+        2:["key","f","KeyF"],        // X / square
+        3:["key","e","KeyE"],        // Y / triangle
+        11:["key","Shift","ShiftLeft"], // RS
+        10:["key","Control","ControlLeft"] // LS
     };
 
     gp.buttons.forEach((btn,i)=>{
@@ -237,29 +238,29 @@ function gamepadLoop(){
         let prev = prevButtons[i];
 
         if(pressed && !prev){
-            let action = map[i];
+            let a = map[i];
 
-            if(action[0]=="mouse") mouseClick(action[1],"mousedown");
-            if(action[0]=="scroll") scroll(action[1]);
-            if(action[0]=="key") sendKey(action[1],"keydown");
+            if(a[0]=="mouse") mouseButton("mousedown",a[1]);
+            if(a[0]=="scroll") scroll(a[1]);
+            if(a[0]=="key") keyEvent("keydown",a[1],a[2]);
         }
 
         if(!pressed && prev){
-            let action = map[i];
+            let a = map[i];
 
-            if(action[0]=="mouse") mouseClick(action[1],"mouseup");
-            if(action[0]=="key") sendKey(action[1],"keyup");
+            if(a[0]=="mouse") mouseButton("mouseup",a[1]);
+            if(a[0]=="key") keyEvent("keyup",a[1],a[2]);
         }
 
         prevButtons[i] = pressed;
     });
 
-    requestAnimationFrame(gamepadLoop);
+    requestAnimationFrame(loop);
 }
 
 window.addEventListener("gamepadconnected",()=>{
-    console.log("Controller connected");
-    gamepadLoop();
+    canvas.focus();
+    loop();
 });
 </script>
 </body>
