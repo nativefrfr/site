@@ -158,128 +158,50 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
      crossorigin="anonymous"></script>
 
-     <script>
-let deadzone = 0.2;
-let prevButtons = {};
-let keyState = {};
+<button id="zoomBtn" style="
+position:fixed;
+bottom:20px;
+right:20px;
+z-index:999999;
+padding:12px 18px;
+font-size:18px;
+border:none;
+background:#3a7afe;
+color:white;
+border-radius:8px;
+cursor:pointer;
+">ZOOM</button>
 
-function pressKey(key, code, down){
-    if(keyState[code] === down) return;
-    keyState[code] = down;
+<script>
+const zoomBtn = document.getElementById("zoomBtn");
+const canvas = document.getElementById("unity-canvas");
 
-    window.dispatchEvent(new KeyboardEvent(down ? "keydown" : "keyup",{
-        key:key,
-        code:code,
-        bubbles:true
-    }));
-}
-
-function mouseButton(button, down){
-    window.dispatchEvent(new MouseEvent(down ? "mousedown" : "mouseup",{
-        button:button,
-        bubbles:true
-    }));
-}
-
-function mouseMove(dx,dy){
-    window.dispatchEvent(new MouseEvent("mousemove",{
-        clientX:window.innerWidth/2 + dx,
-        clientY:window.innerHeight/2 + dy,
-        bubbles:true
-    }));
-}
-
-function scroll(amount){
-    window.dispatchEvent(new WheelEvent("wheel",{deltaY:amount}));
-}
-
-function loop(){
-
-    const gp = navigator.getGamepads()[0];
-    if(!gp){
-        requestAnimationFrame(loop);
-        return;
+zoomBtn.onclick = () => {
+    // request pointer lock on the canvas
+    if(canvas.requestPointerLock){
+        canvas.requestPointerLock();
     }
 
-    /* LEFT STICK → WASD */
-
-    let lx = gp.axes[0];
-    let ly = gp.axes[1];
-
-    if(Math.abs(lx) < deadzone) lx = 0;
-    if(Math.abs(ly) < deadzone) ly = 0;
-
-    pressKey("d","KeyD", lx > 0);
-    pressKey("a","KeyA", lx < 0);
-
-    pressKey("s","KeyS", ly > 0);
-    pressKey("w","KeyW", ly < 0);
-
-
-    /* RIGHT STICK → CAMERA */
-
-    let rx = gp.axes[2];
-    let ry = gp.axes[3];
-
-    if(Math.abs(rx) > deadzone || Math.abs(ry) > deadzone){
-        mouseMove(rx*50, ry*50);
+    // fullscreen helps on iPad for proper input
+    if(canvas.requestFullscreen){
+        canvas.requestFullscreen();
     }
 
+    canvas.focus();
+};
 
-    /* BUTTON MAP */
+// update button text depending on pointer lock state
+document.addEventListener("pointerlockchange", () => {
+    if(document.pointerLockElement === canvas){
+        zoomBtn.innerText = "UNLOCK";
+    } else {
+        zoomBtn.innerText = "ZOOM";
+    }
+});
 
-    const map = {
-        7:["mouse",0],        // RT
-        6:["mouse",2],        // LT
-        5:["scroll",-120],    // RB
-        4:["scroll",120],     // LB
-        0:["key"," ","Space"],        // A
-        2:["key","f","KeyF"],         // X
-        3:["key","e","KeyE"],         // Y
-        11:["key","Shift","ShiftLeft"], // RS
-        10:["key","Control","ControlLeft"] // LS
-    };
-
-    gp.buttons.forEach((btn,i)=>{
-        if(!map[i]) return;
-
-        let pressed = btn.pressed;
-        let prev = prevButtons[i];
-
-        if(pressed && !prev){
-
-            let action = map[i];
-
-            if(action[0] === "mouse")
-                mouseButton(action[1],true);
-
-            if(action[0] === "scroll")
-                scroll(action[1]);
-
-            if(action[0] === "key")
-                pressKey(action[1],action[2],true);
-        }
-
-        if(!pressed && prev){
-
-            let action = map[i];
-
-            if(action[0] === "mouse")
-                mouseButton(action[1],false);
-
-            if(action[0] === "key")
-                pressKey(action[1],action[2],false);
-        }
-
-        prevButtons[i] = pressed;
-    });
-
-    requestAnimationFrame(loop);
-}
-
-window.addEventListener("gamepadconnected",()=>{
-    console.log("controller connected");
-    loop();
+// optional: double click to unlock
+zoomBtn.addEventListener("dblclick", () => {
+    document.exitPointerLock();
 });
 </script>
 </body>

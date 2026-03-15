@@ -188,6 +188,7 @@ overflow:hidden;
 height:24px;
 }
 
+
 .count span{
 display:inline-block;
 transform:translateY(10px);
@@ -210,10 +211,23 @@ padding:20px;
 }
 
 /* CARD */
+.playCount{
+position:center;
+display:center;
+background:rgba(15, 15, 15, 0.7);
+color:white;
+font-size:12px;
+padding:4px 6px;
+border-radius:4px;
+pointer-events:none;
+width: fit-content;
+margin-left: 3px;
+}
 
 .game{
 border-radius:10px;
 overflow:hidden;
+position:relative;
 box-shadow:0 4px 10px rgba(0,0,0,0.2);
 transition:0.15s;
 white-space: 10px;
@@ -243,6 +257,7 @@ display:block;
 padding:10px;
 text-decoration:none;
 font-weight:600;
+font-size: 13px;
 }
 
 /* DISCLAIMER */
@@ -316,6 +331,8 @@ font-weight:bold;
 cursor:pointer;
 z-index:50;
 border-radius: 5px;
+display: none;
+width: auto;
 }
 
 
@@ -398,6 +415,7 @@ Click to accept the disclaimer
 <p class="">I do not own these games. All rights belong to their owners. If you want a game taken down, email <b>admin@native.beer</b></p>
 <p class="">email <b>suggestions@native.beer</b> to suggest games to add! </p>
 <p class="redtext" id="redtext">go to https://native.beer/work?icon=classroom to have a different tab name</p>
+<p class="redtext" id="info"></p>
 <p style="font-size: 11px; color:#666666">*If you live in france, you will get a security challenge, that is to combat crawlers</p>
 </header>
 
@@ -413,7 +431,7 @@ Click to accept the disclaimer
 <div class="games" id="games"></div>
 
 
-<div class="classroomBtn" onclick="window.location='https://classroom.google.com/'">
+<div class="classroomBtn" id="classroombutton" onclick="window.location='https://classroom.google.com/'">
 leave site quickly
 </div>
 
@@ -422,126 +440,165 @@ leave site quickly
 <script>
 /* GAME LIST */
 
-const games=[
-['1v1.lol💻', '1v1lol'],
-['8ball billiards 📱+💻', '8ballbillards'],
-['A Difficult Game About Climbing 📱+💻', 'adgac'],
-['angry birds📱+💻', 'angrybirds'],
-['attack hole📱+💻', 'attackhole'],
-['backrooms ❔', 'backrooms'],
-['bad piggies 📱+💻', 'badpiggies'],
-['baldi 📱+💻', 'baldi'],
-['basket random 📱+💻', 'basketrandom'],
-['basketball ❔', 'basketball'],
-['bitlife📱+💻', 'bit'],
-['blockblast 📱+💻', 'blockblast'],
-['bloons tower defense 2 📱+💻', 'td2'],
-['bloons tower defense 4 📱+💻', 'td4'],
-['bottle jump 📱+💻', 'bottlejump'],
-['bowmasters 📱+💻', 'bowmasters'],
-['boxing random 📱+💻', 'boxingrandom'],
-['buckshot roulette 💻', 'buckshot'],
-['celeste 💻', 'celeste'],
-['cluster rush 📱+💻', 'clusterrush'],
-['colour match 📱+💻', 'colourmatch'],
-['cookie clicker 💻', 'cookie'],
-['crazy cattle 💻', 'crazy'],
-['crossy road 📱+💻', 'crossyroad'],
-['cut the rope 📱+💻', 'cuttherope'],
-['dig deep 📱+💻', 'digdeep'],
-['doom 💻', 'doom'],
-['draw climber 📱+💻', 'drawclimber'],
-['driven wild 📱+💻', 'drivienwild'],
-['emulator ❔', 'emulator'],
-['fireboy and water girl 3 📱+💻', 'fireboywatergirl3'],
-['fireboy and water girl 📱+💻', 'fireboywatergirl'],
-['flappy bird multiplayer 📱+💻', 'flappybirdmulti'],
-['flappy dunk 📱+💻', 'flappydunk'],
-['fnaf 1 📱+💻', 'fnaf1'],
-['fnaf 2 📱+💻', 'fnaf2'],
-['fnaf 3 📱+💻', 'fnaf3'],
-['fnaf 4 📱+💻', 'fnaf4'],
-['fork n sausage 📱+💻', 'forknsausage'],
-['friday night funkin 📱+💻', 'fnf'],
-['fruit ninja 📱+💻', 'fruitninja'],
-['geometry dash 📱+💻', 'geometrydash'],
-['gladihoppers ❔', 'gladihoppers'],
-['gobble ❔ ', 'gobble'],
-['granny📱+💻', 'gran'],
-['grow a garden 📱+💻', 'growagarden'],
-['gunspin 📱+💻', 'gunspin'],
-['halflife 💻', 'halflife'],
-['happy wheels 💻', 'happywheels'],
-['highway racer 📱+💻', 'highwayracer'],
-['hollow knight 💻', 'hk'],
-['hook ❔', 'hook'],
-['icedodo ❔', 'icedodo'],
-['jellydrift 📱+💻', 'jellydrift'],
-['jetpackjoyride 📱+💻', 'jetpackjoyride'],
-['magic tiles 📱+💻', 'magictiles'],
-['mobcontrol 📱+💻', 'mobcontrol'],
-['monster tracks 📱+💻', 'monstertracks'],
-['moto X3M 2 📱+💻', 'motox3m2'],
-['moto X3M 3 📱+💻', 'motox3m3'],
-['moto X3M 6 📱+💻', 'motox3m6'],
-['omori💻', 'omori'],
-['oneshot 📱+💻', 'oneshot'],
-['osu 📱+💻', 'osu'],
-['ovo 2 📱+💻', 'ovo2'],
-['ovo dimensions 📱+💻', 'ovod'],
-['ovo 📱+💻', 'ovo'],
-['peggle 📱+💻', 'peggle'],
-['pixel gun survival 📱+💻', 'pixelgun'],
-['pou 📱+💻', 'pou'],
-['pvz2💻', 'pvz2'],
-['pvz📱+💻', 'pvz'],
-['raft📱+💻', 'raft'],
-['ragdoll hit 📱+💻', 'ragdollhit'],
-['repo 💻', 'repo'],
-['retro bowl college 📱+💻', 'retrobowlc'],
-['retro bowl 📱+💻', 'retrobowl'],
-['road of fury 📱+💻', 'roadoffury'],
-['slime rancher 💻', 'slime'],
-['slither.io 📱+💻', 'slither'],
-['slope 📱+💻', 'slope'],
-['solar smash 📱+💻', 'solarsmash'],
-['soundboard 📱+💻', 'soundboard'],
-['sprunki 📱+💻', 'sprunki'],
-['steal a brainrot (ONLINE) 📱+💻', 'stealabrainrotonline'],
-['steal a brainrot 📱+💻', 'stealabrainrot'],
-['survivor.io📱+💻', 'survivorio'],
-['temple run 📱+💻', 'templerun'],
-['terraria 💻', 'ter'],
-['thats not my neighbor💻', 'tnmn'],
-['the binding of isaac 💻', 'tboi'],
-['ultimate custom night (fnaf) 📱+💻', 'customnight'],
-['ultrakill📱+💻', 'ultra'],
-['water sort 📱+💻', 'watersort'],
-['wave 📱+💻', 'wave'],
-['wordle 📱+💻', 'wordle'],
-['worldbox 📱+💻', 'worldbox']
+const params = new URLSearchParams(window.location.search);
+let games
+
+if (params.get("icon") == "bypass") {
+    games=[
+        ["son im crine", "fnaf"]
+    ]
+}
+else{
+
+    games=[
+    ['1v1.lol💻', '1v1lol'],
+    ['8ball billiards 📱+💻', '8ballbillards'],
+    ['A Difficult Game About Climbing 📱+💻', 'adgac'],
+    ['angry birds📱+💻', 'angrybirds'],
+    ['attack hole📱+💻', 'attackhole'],
+    ['backrooms ❔', 'backrooms'],
+    ['bad piggies 📱+💻', 'badpiggies'],
+    ['baldi 📱+💻', 'baldi'],
+    ['basket random 📱+💻', 'basketrandom'],
+    ['basketball ❔', 'basketball'],
+    ['bitlife📱+💻', 'bit'],
+    ['blockblast 📱+💻', 'blockblast'],
+    ['bloons tower defense 2 📱+💻', 'td2'],
+    ['bloons tower defense 4 📱+💻', 'td4'],
+    ['bottle jump 📱+💻', 'bottlejump'],
+    ['bowmasters 📱+💻', 'bowmasters'],
+    ['boxing random 📱+💻', 'boxingrandom'],
+    ['buckshot roulette 💻', 'buckshot'],
+    ['celeste 💻', 'celeste'],
+    ['cluster rush 📱+💻', 'clusterrush'],
+    ['colour match 📱+💻', 'colourmatch'],
+    ['cookie clicker 💻', 'cookie'],
+    ['crazy cattle 💻', 'crazy'],
+    ['crossy road 📱+💻', 'crossyroad'],
+    ['cut the rope 📱+💻', 'cuttherope'],
+    ['dig deep 📱+💻', 'digdeep'],
+    ['doom 💻', 'doom'],
+    ['draw climber 📱+💻', 'drawclimber'],
+    ['driven wild 📱+💻', 'drivienwild'],
+    ['emulator ❔', 'emulator'],
+    ['fireboy and water girl 3 📱+💻', 'fireboywatergirl3'],
+    ['fireboy and water girl 📱+💻', 'fireboywatergirl'],
+    ['flappy bird multiplayer 📱+💻', 'flappybirdmulti'],
+    ['flappy dunk 📱+💻', 'flappydunk'],
+    ['fnaf 1 📱+💻', 'fnaf1'],
+    ['fnaf 2 📱+💻', 'fnaf2'],
+    ['fnaf 3 📱+💻', 'fnaf3'],
+    ['fnaf 4 📱+💻', 'fnaf4'],
+    ['fork n sausage 📱+💻', 'forknsausage'],
+    ['friday night funkin 📱+💻', 'fnf'],
+    ['fruit ninja 📱+💻', 'fruitninja'],
+    ['geometry dash 📱+💻', 'geometrydash'],
+    ['gladihoppers ❔', 'gladihoppers'],
+    ['gobble ❔ ', 'gobble'],
+    ['granny📱+💻', 'gran'],
+    ['grow a garden 📱+💻', 'growagarden'],
+    ['gunspin 📱+💻', 'gunspin'],
+    ['halflife 💻', 'halflife'],
+    ['happy wheels 💻', 'happywheels'],
+    ['highway racer 📱+💻', 'highwayracer'],
+    ['hollow knight 💻', 'hk'],
+    ['hook ❔', 'hook'],
+    ['icedodo ❔', 'icedodo'],
+    ['jellydrift 📱+💻', 'jellydrift'],
+    ['jetpackjoyride 📱+💻', 'jetpackjoyride'],
+    ['magic tiles 📱+💻', 'magictiles'],
+    ['mobcontrol 📱+💻', 'mobcontrol'],
+    ['monster tracks 📱+💻', 'monstertracks'],
+    ['moto X3M 2 📱+💻', 'motox3m2'],
+    ['moto X3M 3 📱+💻', 'motox3m3'],
+    ['moto X3M 6 📱+💻', 'motox3m6'],
+    ['omori💻', 'omori'],
+    ['oneshot 📱+💻', 'oneshot'],
+    ['osu 📱+💻', 'osu'],
+    ['ovo 2 📱+💻', 'ovo2'],
+    ['ovo dimensions 📱+💻', 'ovod'],
+    ['ovo 📱+💻', 'ovo'],
+    ['peggle 📱+💻', 'peggle'],
+    ['pixel gun survival 📱+💻', 'pixelgun'],
+    ['pou 📱+💻', 'pou'],
+    ['pvz2💻', 'pvz2'],
+    ['pvz📱+💻', 'pvz'],
+    ['raft📱+💻', 'raft'],
+    ['ragdoll hit 📱+💻', 'ragdollhit'],
+    ['repo 💻', 'repo'],
+    ['retro bowl college 📱+💻', 'retrobowlc'],
+    ['retro bowl 📱+💻', 'retrobowl'],
+    ['road of fury 📱+💻', 'roadoffury'],
+    ['slime rancher 💻', 'slime'],
+    ['slither.io 📱+💻', 'slither'],
+    ['slope 📱+💻', 'slope'],
+    ['solar smash 📱+💻', 'solarsmash'],
+    ['soundboard 📱+💻', 'soundboard'],
+    ['sprunki 📱+💻', 'sprunki'],
+    ['steal a brainrot (ONLINE) 📱+💻', 'stealabrainrotonline'],
+    ['steal a brainrot 📱+💻', 'stealabrainrot'],
+    ['survivor.io📱+💻', 'survivorio'],
+    ['temple run 📱+💻', 'templerun'],
+    ['terraria 💻', 'ter'],
+    ['thats not my neighbor💻', 'tnmn'],
+    ['the binding of isaac 💻', 'tboi'],
+    ['ultimate custom night (fnaf) 📱+💻', 'customnight'],
+    ['ultrakill📱+💻', 'ultra'],
+    ['water sort 📱+💻', 'watersort'],
+    ['wave 📱+💻', 'wave'],
+    ['wordle 📱+💻', 'wordle'],
+    ['worldbox 📱+💻', 'worldbox']
 
 ]
-
+}
 
 /* BUILD GRID */
 
+
 const container=document.getElementById("games")
 
+function getPlays(id){
+    return Number(localStorage.getItem("plays_"+id)) || 0
+}
+
+// sort by most played
+games.sort((a,b)=>getPlays(b[1]) - getPlays(a[1]))
+
 games.forEach(g=>{
+
+const plays = getPlays(g[1])
 
 const card=document.createElement("div")
 card.className="game"
 
 card.innerHTML=`
-<a href="https://native.beer/work/${g[1]}"><img src="./assets/${g[1]}.png" class="img"></a>
-<a href="https://native.beer/work/${g[1]}">${g[0]}</a>
+<a class="gameLink" data-id="${g[1]}" href="https://native.beer/work/${g[1]}">
+<img src="./assets/${g[1]}.png" class="img">
+</a>
+<div class="playCount">${plays} plays</div>
+<a class="gameLink" data-id="${g[1]}" href="https://native.beer/work/${g[1]}">${g[0]}</a>
 `
 
 container.appendChild(card)
 
 })
 
+/* TRACK PLAYS */
+
+document.querySelectorAll(".gameLink").forEach(link=>{
+
+link.addEventListener("click",()=>{
+
+const id = link.dataset.id
+
+let plays = Number(localStorage.getItem("plays_"+id)) || 0
+plays++
+
+localStorage.setItem("plays_"+id,plays)
+
+})
+
+})
 
 /* SEARCH */
 
@@ -604,14 +661,13 @@ animateCount(visible)
 updateCount()
 
 /* CHANGE TAB FOR ?icon=classroom */
-
-const params = new URLSearchParams(window.location.search);
-
+const classroombutton = document.getElementById("classroombutton");
 if (params.get("icon") === "classroom") {
     // Change tab title
     document.title = "Home - Classroom";
     redtext.innerText='The tab is named "Home - Classroom"!'
     redtext.style.color='#009900'
+    classroombutton.style.display="flex"
     // Change favicon
     let favicon = document.querySelector("link[rel='icon']");
     if (!favicon) {
@@ -622,16 +678,37 @@ if (params.get("icon") === "classroom") {
     favicon.href = "./classroom.ico";
 }
 
-search.value=''
-
 /* DISCLAIMER ALWAYS REQUIRED */
 
-const overlay=document.getElementById("overlay")
 const agree=document.getElementById("agree")
 const enter=document.getElementById("enter")
+const overlay=document.getElementById("overlay")
+
+search.value=''
+
+if (params.get("icon") === "admin") {
+    // Change tab title
+    document.title = "admin panel"
+    overlay.style.display="none"
+    redtext.style.color='#0072FE'
+    let totalPlayed = 0;
+
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+
+        if (key.startsWith("plays_")) {
+            totalPlayed += Number(localStorage.getItem(key)) || 0;
+        }
+    }
+
+    console.log(totalPlayed);
+    redtext.innerText=`you are admin. total played games: ${totalPlayed}`
+}
 
 // Always show overlay on load
-overlay.style.display="flex"
+if (params.get("icon") !== "admin") {
+    overlay.style.display="flex"
+}
 
 // Enable enter button only when checked
 agree.onchange=()=>{
