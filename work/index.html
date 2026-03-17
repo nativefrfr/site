@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html>
+      <title>native games!</title>
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+/* THEMES */
+
+body{
+margin:0;
+font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
+transition:0.25s;
+}
+
+/* DARK MODE */
+
+body.dark{
+background:#0f1115;
+color:#e6e6e6;
+}
+
+body.dark header{
+background:#171a21;
+border-bottom:1px solid #2b2f36;
+}
+
+body.dark .game{
+background:#1a1d24;
+}
+
+body.dark .game:hover{
+background:#323846;
+}
+
+body.dark .game:active{
+background:#2456bb;
+}
+
+body.dark .game a{
+color:white;
+}
+
+/* LIGHT MODE */
+
+body.light{
+background:#f4f6f8;
+color:#222;
+}
+
+body.light header{
+background:white;
+border-bottom:1px solid #ddd;
+}
+
+body.light .game{
+background:white;
+}
+
+body.light .game:hover{
+background:rgb(160, 160, 160);
+}
+
+body.light .game:active{
+background: #7faaff;
+}
+
+body.light .game a{
+color:#222;
+}
+
+/* checkbox */
+.checkbox4{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+cursor:pointer;
+margin:auto;
+width:fit-content;
+}
+
+.checkbox4 input{
+appearance:none;
+width:22px;
+height:22px;
+border:3px solid #3a7afe;
+border-radius:4px;
+background:#86a7e9;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+transition:0.2s;
+}
+
+.checkbox4 input:checked{
+background:#3a7afe;
+}
+
+.checkbox4 input:checked::after{
+content:"✔";
+color:white;
+font-size:14px;
+}
+
+
+/* HEADER */
+
+header{
+padding:30px;
+text-align:center;
+}
+
+/* THEME BUTTON */
+
+.themeToggle{
+position:fixed;
+top:15px;
+left:15px;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+background:#3a7afe;
+color:white;
+cursor:pointer;
+z-index:10;
+transition:0.2s;
+height: fit-content;
+width: fit-content;
+}
+
+.themeToggle:hover{
+position:fixed;
+top:15px;
+left:15px;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+background:#2c62cf;
+color:white;
+cursor:pointer;
+z-index:10;
+transition:0.2s;
+font-size:15px;
+}
+
+.themeToggle:active{
+position:fixed;
+top:15px;
+left:15px;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+background:#183a7e;
+color:white;
+cursor:pointer;
+z-index:10;
+transition:0.2s;
+font-size:13px;
+}
+/* SEARCH */
+
+.searchBox{
+text-align:center;
+margin:30px;
+}
+
+.searchBox input{
+padding:12px 16px;
+width:320px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:16px;
+}
+
+/* COUNT */
+
+.count{
+text-align:center;
+margin-bottom:10px;
+opacity:0.8;
+font-weight:600;
+font-size:18px;
+overflow:hidden;
+height:24px;
+}
+
+
+.count span{
+display:inline-block;
+transform:translateY(10px);
+opacity:0;
+transition:transform 0.18s ease, opacity 0.18s ease;
+}
+
+.count span.show{
+transform:translateY(0);
+opacity:1;
+}
+
+/* GRID */
+
+.games{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+gap:20px;
+padding:20px;
+}
+
+/* CARD */
+.playCount{
+position:center;
+display:center;
+background:rgba(15, 15, 15, 0.7);
+color:white;
+font-size:12px;
+padding:4px 6px;
+border-radius:4px;
+pointer-events:none;
+width: fit-content;
+margin-left: 3px;
+}
+
+.game{
+border-radius:10px;
+overflow:hidden;
+position:relative;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+transition:0.15s;
+white-space: 10px;
+height:auto;
+}
+
+.game:hover{
+transform:translateY(-6px);
+box-shadow:0 4px 10px rgba(112, 142, 146, 0.2);
+}
+
+.game img{
+width:100%;
+height:120px;
+object-fit:cover;
+transition:0.15s;
+}
+
+.game img:hover{
+width:100%;
+height:120px;
+object-fit:cover;
+transition:0.15s;
+}
+.game a{
+display:block;
+padding:10px;
+text-decoration:none;
+font-weight:600;
+font-size: 13px;
+}
+
+/* DISCLAIMER */
+
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0, 0, 0, 0.9);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:999;
+transition: 0.2s;
+}
+
+.overlay:active{
+position:fixed;
+inset:0;
+background:rgba(15, 15, 15, 0.9);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:999;
+transition: 0.2s;
+}
+
+.disclaimer{
+background:rgba(223, 59, 59, 1);
+padding:30px;
+border-radius:10px;
+border: 5px solid rgba(138, 0, 0,1);
+display: block;
+max-width:550px;
+text-align:center;
+transition: 0.2s;
+}
+
+.disclaimer button{
+margin-top:15px;
+padding:10px 20px;
+border:none;
+background:#3a7afe;
+color:white;
+border-radius:6px;
+border: 3px solid #3069db;
+font-size:16px;
+cursor:pointer;
+transition:0.15s;
+}
+
+.disclaimer button:hover{
+margin-top:15px;
+padding:10px 20px;
+border:none;
+background:#2c62cf;
+color:white;
+border-radius:6px;
+border: 3px solid #2456bb;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.disclaimer button:disabled{
+background:#aaa;
+border-radius:6px;
+border: 3px solid #979797;
+}
+
+/* BOTTOM BUTTON */
+
+.classroomBtn{
+position:fixed;
+bottom:0;
+right:0;
+width:20%;
+background:#b15151;
+color:white;
+text-align:center;
+padding:14px;
+font-weight:bold;
+cursor:pointer;
+z-index:50;
+border-radius: 5px;
+display: none;
+width: auto;
+}
+
+
+.classroomBtn:hover{
+background:#7a0303;
+transition:0.15s;
+}
+
+.img{
+    border-radius: 10px;
+    scale:105%;
+    transform: translateY(-2);
+}
+.img:hover{
+    border-radius: 5px;
+    scale:106%;
+    transform: translateY(-2);
+}
+.redtext{
+    color:#c70000;
+}
+
+.square button {
+    width: 60px;               /* fixed width */
+    height: 60px;              /* fixed height to match width */
+    background: #3a7afe;
+    color: white;
+    border-radius: 6px;
+    border: 3px solid #3069db;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.15s;
+    font-size:15px;
+    display: flex;             /* center text/icon */
+    align-items: center;
+    justify-content: center;
+    padding: 0;                /* remove padding to keep it square */
+    text-align: center;
+}
+
+
+</style>
+</head>
+
+<body class="dark">
+
+<button class="themeToggle" id="themeBtn">Toggle theme</button>
+
+<div class="overlay" id="overlay">
+
+<div class="disclaimer" id="disclaimer">
+
+<h2 style="color: #680000;">⚠️ Disclaimer! ⚠️</h2>
+
+<p style="color: #000000;">I am not responsible for anything that happens when you play these games.</p>
+<p style="color: #000000;">I have the right to block individuals from accessing this site at my own will.</p>
+<p style="color: #000000;">this site was created for me to learn and get better at html and css.</p>
+<p style="color: #000000;">If you play these in a school enviroment, you will be at risk.</p>
+<p style="color: #000000;">I do not own these games. All rights belong to their respective owners. If you want a game taken down, email <b>admin@native.beer</b></p>
+<p style="color: #000000;">there is ads to keep this website free for everyone. buying urls can be expensive</p>
+
+<label class="checkbox4">
+<input type="checkbox" id="agree">
+Click to accept the disclaimer
+</label>
+
+<p style="font-size: 10px; color: #4d4d4d">*you will have to agree every time you go onto the site</p>
+
+<br>
+
+<button id="enter" disabled>Enter Site</button>
+
+</div>
+</div>
+
+
+<header>
+<h1>Playables!</h1>
+<p class="">I am not responsible for anything that happens when you play these games.</p>
+<p class="">If you play these in a school enviroment, you will be at risk.</p>
+<p class="">this site was created for me to learn and get better at html and css.</p>
+<p class="">I do not own these games. All rights belong to their owners. If you want a game taken down, email <b>admin@native.beer</b></p>
+<p class="">email <b>suggestions@native.beer</b> to suggest games to add! </p>
+<p class="">some games have sound so be warned.</p>
+<p class="redtext" id="redtext">go to https://native.beer/i_am_a_gimp?icon=classroom to have a different tab name</p>
+<p class="redtext" id="info"></p>
+<p style="font-size: 11px; color:#666666">*If you live in france, you will get a security challenge, that is to combat crawlers</p>
+</header>
+
+<div class="searchBox">
+<button class = square id="clear">❌</button>
+<input id="search" placeholder="Search for games!">
+<button class = square id="pcbutton">💻</button>
+<button class = square id="tabletbutton">📱</button>
+</div>
+
+<div class="count" id="count"></div>
+
+<div class="games" id="games"></div>
+
+
+<div class="classroomBtn" id="classroombutton" onclick="window.location='https://classroom.google.com/'">
+leave site quickly
+</div>
+
+
+
+<script>
+/* GAME LIST */
+
+const params = new URLSearchParams(window.location.search);
+let games
+
+if (params.get("icon") == "bypass") {
+    games=[
+        ["son im crine", "fnaf"]
+    ]
+}
+else{
+
+    games=[
+    ['1v1.lol💻', '1v1lol'],
+    ['8ball billiards 📱+💻', '8ballbillards'],
+    ['A Difficult Game About Climbing 📱+💻', 'adgac'],
+    ['angry birds📱+💻', 'angrybirds'],
+    ['attack hole📱+💻', 'attackhole'],
+    ['backrooms ❔', 'backrooms'],
+    ['bad piggies 📱+💻', 'badpiggies'],
+    ['baldi 📱+💻', 'baldi'],
+    ['basket random 📱+💻', 'basketrandom'],
+    ['basketball ❔', 'basketball'],
+    ['bitlife📱+💻', 'bit'],
+    ['blockblast 📱+💻', 'blockblast'],
+    ['bloons tower defense 2 📱+💻', 'td2'],
+    ['bloons tower defense 4 📱+💻', 'td4'],
+    ['bottle jump 📱+💻', 'bottlejump'],
+    ['bowmasters 📱+💻', 'bowmasters'],
+    ['boxing random 📱+💻', 'boxingrandom'],
+    ['buckshot roulette 💻', 'buckshot'],
+    ['celeste 💻', 'celeste'],
+    ['cluster rush 📱+💻', 'clusterrush'],
+    ['colour match 📱+💻', 'colourmatch'],
+    ['cookie clicker 💻', 'cookie'],
+    ['crazy cattle 💻', 'crazy'],
+    ['crossy road 📱+💻', 'crossyroad'],
+    ['cut the rope 📱+💻', 'cuttherope'],
+    ['dig deep 📱+💻', 'digdeep'],
+    ['doom 💻', 'doom'],
+    ['draw climber 📱+💻', 'drawclimber'],
+    ['driven wild 📱+💻', 'drivienwild'],
+    ['emulator ❔', 'emulator'],
+    ['fireboy and water girl 3 📱+💻', 'fireboywatergirl3'],
+    ['fireboy and water girl 📱+💻', 'fireboywatergirl'],
+    ['flappy bird multiplayer 📱+💻', 'flappybirdmulti'],
+    ['flappy dunk 📱+💻', 'flappydunk'],
+    ['fnaf 1 📱+💻', 'fnaf1'],
+    ['fnaf 2 📱+💻', 'fnaf2'],
+    ['fnaf 3 📱+💻', 'fnaf3'],
+    ['fnaf 4 📱+💻', 'fnaf4'],
+    ['fork n sausage 📱+💻', 'forknsausage'],
+    ['friday night funkin 📱+💻', 'fnf'],
+    ['fruit ninja 📱+💻', 'fruitninja'],
+    ['geometry dash 📱+💻', 'geometrydash'],
+    ['gladihoppers ❔', 'gladihoppers'],
+    ['gobble ❔ ', 'gobble'],
+    ['granny📱+💻', 'gran'],
+    ['grow a garden 📱+💻', 'growagarden'],
+    ['gunspin 📱+💻', 'gunspin'],
+    ['halflife 💻', 'halflife'],
+    ['happy wheels 💻', 'happywheels'],
+    ['highway racer 📱+💻', 'highwayracer'],
+    ['hollow knight 💻', 'hk'],
+    ['hook ❔', 'hook'],
+    ['icedodo ❔', 'icedodo'],
+    ['jellydrift 📱+💻', 'jellydrift'],
+    ['jetpackjoyride 📱+💻', 'jetpackjoyride'],
+    ['magic tiles 📱+💻', 'magictiles'],
+    ['mobcontrol 📱+💻', 'mobcontrol'],
+    ['monster tracks 📱+💻', 'monstertracks'],
+    ['moto X3M 2 📱+💻', 'motox3m2'],
+    ['moto X3M 3 📱+💻', 'motox3m3'],
+    ['moto X3M 6 📱+💻', 'motox3m6'],
+    ['omori💻', 'omori'],
+    ['oneshot 📱+💻', 'oneshot'],
+    ['osu 📱+💻', 'osu'],
+    ['ovo 2 📱+💻', 'ovo2'],
+    ['ovo dimensions 📱+💻', 'ovod'],
+    ['ovo 📱+💻', 'ovo'],
+    ['peggle 📱+💻', 'peggle'],
+    ['pixel gun survival 📱+💻', 'pixelgun'],
+    ['pou 📱+💻', 'pou'],
+    ['pvz2💻', 'pvz2'],
+    ['pvz📱+💻', 'pvz'],
+    ['raft📱+💻', 'raft'],
+    ['ragdoll hit 📱+💻', 'ragdollhit'],
+    ['repo 💻', 'repo'],
+    ['retro bowl college 📱+💻', 'retrobowlc'],
+    ['retro bowl 📱+💻', 'retrobowl'],
+    ['road of fury 📱+💻', 'roadoffury'],
+    ['slime rancher 💻', 'slime'],
+    ['slither.io 📱+💻', 'slither'],
+    ['slope 📱+💻', 'slope'],
+    ['solar smash 📱+💻', 'solarsmash'],
+    ['soundboard 📱+💻', 'soundboard'],
+    ['sprunki 📱+💻', 'sprunki'],
+    ['steal a brainrot (ONLINE) 📱+💻', 'stealabrainrotonline'],
+    ['steal a brainrot 📱+💻', 'stealabrainrot'],
+    ['survivor.io📱+💻', 'survivorio'],
+    ['temple run 📱+💻', 'templerun'],
+    ['terraria 💻', 'ter'],
+    ['thats not my neighbor💻', 'tnmn'],
+    ['the binding of isaac 💻', 'tboi'],
+    ['ultimate custom night (fnaf) 📱+💻', 'customnight'],
+    ['ultrakill📱+💻', 'ultra'],
+    ['water sort 📱+💻', 'watersort'],
+    ['wave 📱+💻', 'wave'],
+    ['wordle 📱+💻', 'wordle'],
+    ['worldbox 📱+💻', 'worldbox'],
+    ['Minecraft pocket 📱+💻', 'minecraftpocket']
+
+]
+}
+
+/* BUILD GRID */
+
+
+const container=document.getElementById("games")
+
+function getPlays(id){
+    return Number(localStorage.getItem("plays_"+id)) || 0
+}
+
+// sort by most played
+games.sort((a,b)=>getPlays(b[1]) - getPlays(a[1]))
+
+games.forEach(g=>{
+
+const plays = getPlays(g[1])
+
+const card=document.createElement("div")
+card.className="game"
+
+card.innerHTML=`
+<a class="gameLink" data-id="${g[1]}" href="https://native.beer/i_am_a_gimp/${g[1]}">
+<img src="./assets/${g[1]}.png" class="img">
+</a>
+<div class="playCount">${plays} plays</div>
+<a class="gameLink" data-id="${g[1]}" href="https://native.beer/i_am_a_gimp/${g[1]}">${g[0]}</a>
+`
+
+container.appendChild(card)
+
+})
+
+/* TRACK PLAYS */
+
+document.querySelectorAll(".gameLink").forEach(link=>{
+
+link.addEventListener("click",()=>{
+
+const id = link.dataset.id
+
+let plays = Number(localStorage.getItem("plays_"+id)) || 0
+plays++
+
+localStorage.setItem("plays_"+id,plays)
+
+})
+
+})
+
+/* SEARCH */
+
+const search=document.getElementById("search")
+const count=document.getElementById("count")
+
+/* SEARCH FILTER */
+
+search.addEventListener("input", () => {
+    const query = search.value.toLowerCase().trim();
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    updateCount(); // Update the visible game count
+});
+
+let currentCount = 0
+let animating = false
+
+function animateCount(target){
+
+if(animating) return
+animating = true
+
+const speed = 1
+const step = Math.max(1, Math.ceil((target - currentCount) / 100))
+
+const interval = setInterval(()=>{
+
+currentCount += step
+
+if(currentCount >= target){
+currentCount = target
+clearInterval(interval)
+animating = false
+}
+
+count.innerHTML = `<span class="show">${currentCount} games</span>`
+
+}, speed)
+
+}
+
+function updateCount(){
+let visible = 0
+
+document.querySelectorAll(".game").forEach(g=>{
+if(g.style.display!="none") visible++
+})
+
+animateCount(visible)
+}
+
+updateCount()
+
+/* CHANGE TAB FOR ?icon=classroom */
+const classroombutton = document.getElementById("classroombutton");
+if (params.get("icon") === "classroom") {
+    // Change tab title
+    document.title = "Home - Classroom";
+    redtext.innerText='The tab is named "Home - Classroom"!'
+    redtext.style.color='#009900'
+    classroombutton.style.display="flex"
+    // Change favicon
+    let favicon = document.querySelector("link[rel='icon']");
+    if (!favicon) {
+        favicon = document.createElement("link");
+        favicon.rel = "icon";
+        document.head.appendChild(favicon);
+    }
+    favicon.href = "./classroom.ico";
+}
+
+/* DISCLAIMER ALWAYS REQUIRED */
+
+const agree=document.getElementById("agree")
+const enter=document.getElementById("enter")
+const overlay=document.getElementById("overlay")
+
+search.value=''
+
+if (params.get("icon") === "admin") {
+    // Change tab title
+    document.title = "admin panel"
+    overlay.style.display="none"
+    redtext.style.color='#0072FE'
+    let totalPlayed = 0;
+
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+
+        if (key.startsWith("plays_")) {
+            totalPlayed += Number(localStorage.getItem(key)) || 0;
+        }
+    }
+
+    console.log(totalPlayed);
+    redtext.innerText=`you are admin. total played games: ${totalPlayed}`
+}
+
+// Always show overlay on load
+if (params.get("icon") !== "admin") {
+    overlay.style.display="flex"
+}
+
+// Enable enter button only when checked
+agree.onchange=()=>{
+    enter.disabled=!agree.checked
+}
+
+enter.onclick = () => {
+    // Start the fade
+    overlay.style.background = "rgba(0, 0, 0, 0)";
+    disclaimer.style.background = "rgba(223, 59, 59, 0)";
+    disclaimer.style.border = "5px solid rgba(138, 0, 0,0)";
+    agree.checked = false;
+    enter.disabled = true;
+
+    // Wait for the transition to finish before hiding
+    overlay.addEventListener('transitionend', function handler() {
+        overlay.style.display = "none";
+        disclaimer.style.display = "none";
+        overlay.removeEventListener('transitionend', handler);
+    });
+};
+
+
+
+/* THEME */
+
+const body=document.body
+const btn=document.getElementById("themeBtn")
+
+if(localStorage.getItem("theme")){
+body.className=localStorage.getItem("theme")
+}
+
+btn.onclick=()=>{
+
+if(body.classList.contains("dark")){
+body.classList.remove("dark")
+body.classList.add("light")
+localStorage.setItem("theme","light")
+}else{
+body.classList.remove("light")
+body.classList.add("dark")
+localStorage.setItem("theme","dark")
+}
+
+}
+
+pcbutton.onclick=()=>{
+search.value='💻'
+const query = search.value.toLowerCase().trim();
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+    updateCount()
+}
+
+tabletbutton.onclick=()=>{
+search.value='📱'
+const query = search.value.toLowerCase().trim();
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+    updateCount()
+}
+
+clear.onclick=()=>{
+search.value=''
+const query = search.value.toLowerCase().trim();
+    document.querySelectorAll(".game").forEach(card => {
+        const name = card.querySelector("a:last-child").innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+    updateCount()
+}
+
+
+
+</script>
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
+     crossorigin="anonymous"></script> -->
+</body>
+
+</html>
