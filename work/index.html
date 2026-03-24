@@ -395,7 +395,7 @@ transition:0.15s;
 <div class="overlay" id="overlay">
 
 <div class="disclaimer" id="disclaimer">
-
+    
 <h2 style="color: #680000; font-size:30px;">⚠️ Disclaimer! ⚠️</h2>
 
 <p style="color: #000000;">I am not responsible for anything that happens when you play these games.</p>
@@ -561,7 +561,24 @@ else{
     ['wave 📱+💻', 'wave'],
     ['wordle 📱+💻', 'wordle'],
     ['worldbox 📱+💻', 'worldbox'],
-    ['Minecraft pocket 📱+💻', 'minecraftpocket']
+    ['Minecraft pocket 📱+💻', 'minecraftpocket'],
+    ['Bendy 💻','bendy'],
+    ['Brawl Stars 📱+💻','brawlstars'],
+    ['Bloons TD5 📱+💻','btd5'],
+    ['cooking mama 📱+💻','cookingmama'],
+    ['crazy cars 📱+💻','crazycars'],
+    ['drift hunters 📱+💻','drifthunters'],
+    ['elastic man 📱+💻','elasticman'],
+    ['going balls 📱+💻','goingballs'],
+    ['Getting Over It 💻','goiwbf'],
+    ['madalin stunt 📱+💻','madalinstunt'],
+    ['super meat boy 💻','meatboy'],
+    ['needy streamer overload 💻','nso'],
+    ['Paper.io 📱+💻','paperio'],
+    ['sandboxels 📱+💻','sandboxels'],
+    ['shwarma kiosk 💻','shwarmakiosk'],
+    ['Hollow knight silksong 💻','silksong'],
+    ['superhot 💻','superhot']
 
 ]
 }
@@ -740,7 +757,7 @@ enter.onclick = () => {
     // Wait for the transition to finish before hiding
     overlay.addEventListener('transitionend', function handler() {
         overlay.style.display = "none";
-        disclaimer.style.display = "none";
+        disclaimer.style.display = "none"; 
         overlay.removeEventListener('transitionend', handler);
     });
 };
@@ -813,7 +830,121 @@ const query = search.value.toLowerCase().trim();
 }
 
 
+/* NOTIFICATIONS (DISCORD STYLE) */
 
+const notifWrap = document.createElement("div");
+notifWrap.style.position = "fixed";
+notifWrap.style.right = "20px";
+notifWrap.style.bottom = "20px";
+notifWrap.style.width = "340px";
+notifWrap.style.display = "flex";
+notifWrap.style.flexDirection = "column";
+notifWrap.style.gap = "10px";
+notifWrap.style.zIndex = "9999";
+document.body.appendChild(notifWrap);
+
+// small red dot indicator
+const redDot = document.createElement("div");
+redDot.style.width = "10px";
+redDot.style.height = "10px";
+redDot.style.background = "red";
+redDot.style.borderRadius = "50%";
+redDot.style.position = "fixed";
+redDot.style.top = "15px";
+redDot.style.right = "15px";
+redDot.style.display = "none";
+document.body.appendChild(redDot);
+
+async function loadNotifications() {
+  const res = await fetch("https://notify.native.beer/notifications");
+  const data = await res.json();
+
+  renderNotifications(data);
+}
+
+function renderNotifications(notifs) {
+  const seen = JSON.parse(localStorage.getItem("seenNotifications") || "[]");
+
+  notifWrap.innerHTML = "";
+
+  let hasUnread = false;
+
+  notifs.forEach(n => {
+
+    const isSeen = seen.includes(n.id);
+    if (!isSeen) hasUnread = true;
+
+    const card = document.createElement("div");
+    card.style.display = "flex";
+    card.style.borderRadius = "10px";
+    card.style.overflow = "hidden";
+    card.style.background = "#1e1f25";
+    card.style.color = "white";
+    card.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
+    card.style.cursor = "pointer";
+    card.style.transition = "0.2s";
+    card.style.minHeight = "70px";
+
+    // left color bar
+    const bar = document.createElement("div");
+    bar.style.width = "6px";
+    bar.style.background = n.color || "#3a7afe";
+
+    // content
+    const content = document.createElement("div");
+    content.style.padding = "10px 12px";
+    content.style.flex = "1";
+
+    const title = document.createElement("div");
+    title.innerText = n.title || "Notification";
+    title.style.fontWeight = "700";
+    title.style.fontSize = "25px";
+    title.style.marginBottom = "4px";
+
+    const text = document.createElement("div");
+    text.innerText = n.text || "";
+    text.style.fontSize = "20px";
+    text.style.opacity = "0.85";
+    text.style.lineHeight = "1.3";
+
+    content.appendChild(title);
+    content.appendChild(text);
+
+    card.appendChild(bar);
+    card.appendChild(content);
+
+    // hover effect
+    card.onmouseenter = () => {
+      card.style.transform = "translateY(-2px)";
+    };
+    card.onmouseleave = () => {
+      card.style.transform = "translateY(0)";
+    };
+
+    // click = mark seen
+    card.onclick = () => {
+      if (!seen.includes(n.id)) {
+        seen.push(n.id);
+        localStorage.setItem("seenNotifications", JSON.stringify(seen));
+      }
+      card.remove();
+
+      // hide red dot if all seen
+      const updated = JSON.parse(localStorage.getItem("seenNotifications") || "[]");
+      if (updated.length === notifs.length) {
+        redDot.style.display = "none";
+      }
+    };
+
+    notifWrap.appendChild(card);
+  });
+
+  redDot.style.display = hasUnread ? "block" : "none";
+}
+
+// initial + refresh
+loadNotifications();
+setInterval(loadNotifications, 30000);
 </script>
 <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
      crossorigin="anonymous"></script> -->
