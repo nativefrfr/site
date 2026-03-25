@@ -578,7 +578,28 @@ else{
     ['sandboxels 📱+💻','sandboxels'],
     ['shwarma kiosk 💻','shwarmakiosk'],
     ['Hollow knight silksong 💻','silksong'],
-    ['superhot 💻','superhot']
+    ['superhot 💻','superhot'],
+    ['Build A Plane 📱+💻','buildaplane'],
+    ['Mega Car Jumps 📱+💻','megacarjumps'],
+    ['Twerk race 📱+💻','twerkrace'],
+    ['Blade Ball 📱+💻','bladeball'],
+    ['Suika Game 📱+💻','suikagame'],
+    ['Draw The Line 📱+💻','drawtheline'],
+    ['Gorilla tag 📱+💻','gorillatag'],
+    ['Just Fall.lol 📱+💻','justfalllol'],
+    ['Tall Man Run 📱+💻','tallmanrun'],
+    ['Drift Boss 📱+💻','driftboss'],
+    ['Build Now.gg 📱+💻','buildnowgg'],
+    ['Super Star Car 📱+💻','superstarcar'],
+    ['Tattle Tail 📱+💻','tattletail'],
+    ['Fortzone 📱+💻','fortzone'],
+    ['Iron Lung 💻','ironlung'],
+    ['State.io 📱+💻','stateio'],
+    ['Rainbow Obby 📱+💻','rainbowobby'],
+    ['Idle Miner 📱+💻','idlemine'],
+    ['Pokemon Emerald 📱+💻','pokemon'],
+    ['Aqua Park 📱+💻','aquapark'],
+    ['Flying Gorilla','flyinggorilla']
 
 ]
 }
@@ -734,6 +755,29 @@ if (params.get("icon") === "admin") {
 
     console.log(totalPlayed);
     redtext.innerText=`you are admin. total played games: ${totalPlayed}`
+}
+
+if (params.get("icon") === "clear") {
+    // Change tab title
+    document.title = "admin panel"
+    overlay.style.display="none"
+    redtext.style.color='#0072FE'
+    let totalPlayed = 0;
+    (() => {
+        localStorage.clear();
+        console.log("Local storage cleared");
+    })();
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+
+        if (key.startsWith("plays_")) {
+            totalPlayed += Number(localStorage.getItem(key)) || 0;
+        }
+    }
+
+    console.log(totalPlayed);
+    redtext.innerText=`you are admin. total played games: ${totalPlayed}`
+
 }
 
 // Always show overlay on load

@@ -158,52 +158,6 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
      crossorigin="anonymous"></script>
 
-<button id="zoomBtn" style="
-position:fixed;
-bottom:20px;
-right:20px;
-z-index:999999;
-padding:12px 18px;
-font-size:18px;
-border:none;
-background:#3a7afe;
-color:white;
-border-radius:8px;
-cursor:pointer;
-">ZOOM</button>
-
-<script>
-const zoomBtn = document.getElementById("zoomBtn");
-const canvas = document.getElementById("unity-canvas");
-
-zoomBtn.onclick = () => {
-    // request pointer lock on the canvas
-    if(canvas.requestPointerLock){
-        canvas.requestPointerLock();
-    }
-
-    // fullscreen helps on iPad for proper input
-    if(canvas.requestFullscreen){
-        canvas.requestFullscreen();
-    }
-
-    canvas.focus();
-};
-
-// update button text depending on pointer lock state
-document.addEventListener("pointerlockchange", () => {
-    if(document.pointerLockElement === canvas){
-        zoomBtn.innerText = "UNLOCK";
-    } else {
-        zoomBtn.innerText = "ZOOM";
-    }
-});
-
-// optional: double click to unlock
-zoomBtn.addEventListener("dblclick", () => {
-    document.exitPointerLock();
-});
-</script>
 </body>
 
 </html>
