@@ -402,7 +402,7 @@ transition:0.15s;
 
 <label class="checkbox4" style="position:fixed; top:15px; left:140px; z-index:10;">
   <input type="checkbox" id="abToggle">
-  about:blank
+  BYPASS (recommended)
 </label>
 
 <div class="overlay" id="overlay">
@@ -828,6 +828,8 @@ container.appendChild(card)
 
 })
 
+
+
 /* TRACK PLAYS */
 
 document.querySelectorAll(".gameLink").forEach(link => {
@@ -864,6 +866,22 @@ document.querySelectorAll(".gameLink").forEach(link => {
   });
 
 });
+
+
+const saved = localStorage.getItem("aboutBlank");
+
+if (saved === null) {
+  // no saved state → default ON
+  abToggle.checked = true;
+  localStorage.setItem("aboutBlank", "true");
+} else {
+  // use saved value
+  abToggle.checked = saved === "true";
+}
+
+abToggle.onchange = () => {
+  localStorage.setItem("aboutBlank", abToggle.checked);
+};
 
 /* SEARCH */
 
