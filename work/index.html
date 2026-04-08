@@ -400,6 +400,11 @@ transition:0.15s;
 
 <button class="themeToggle" id="themeBtn">Toggle theme</button>
 
+<label class="checkbox4" style="position:fixed; top:15px; left:140px; z-index:10;">
+  <input type="checkbox" id="abToggle">
+  about:blank
+</label>
+
 <div class="overlay" id="overlay">
 
 <div class="disclaimer" id="disclaimer">
@@ -786,6 +791,15 @@ else{
 /* BUILD GRID */
 
 
+const abToggle = document.getElementById("abToggle");
+
+// load saved state
+abToggle.checked = localStorage.getItem("aboutBlank") === "true";
+
+abToggle.onchange = () => {
+  localStorage.setItem("aboutBlank", abToggle.checked);
+};
+
 const container=document.getElementById("games")
 
 function getPlays(id){
@@ -816,20 +830,40 @@ container.appendChild(card)
 
 /* TRACK PLAYS */
 
-document.querySelectorAll(".gameLink").forEach(link=>{
+document.querySelectorAll(".gameLink").forEach(link => {
 
-link.addEventListener("click",()=>{
+  link.addEventListener("click", (e) => {
 
-const id = link.dataset.id
+    const id = link.dataset.id;
 
-let plays = Number(localStorage.getItem("plays_"+id)) || 0
-plays++
+    // track plays (unchanged logic)
+    let plays = Number(localStorage.getItem("plays_" + id)) || 0;
+    plays++;
+    localStorage.setItem("plays_" + id, plays);
 
-localStorage.setItem("plays_"+id,plays)
+    // check toggle
+    const useAB = localStorage.getItem("aboutBlank") === "true";
 
-})
+    if (!useAB) return; // let normal link behavior happen
 
-})
+    // STOP normal navigation
+    e.preventDefault();
+
+    const url = link.href;
+
+    const win = window.open("about:blank", "_blank");
+
+    win.document.write(`
+      <iframe src="${url}" 
+      style="border:none;margin:0;padding:0;width:100vw;height:100vh;"
+      allowfullscreen>
+      </iframe>
+    `);
+
+    win.document.title = "Google Classroom";
+  });
+
+});
 
 /* SEARCH */
 
