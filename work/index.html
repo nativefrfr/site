@@ -823,41 +823,42 @@ container.appendChild(card)
 
 
 
-/* TRACK PLAYS */
+/* TRACK PLAYS + TRUE ABOUT:BLANK */
 
-document.querySelectorAll(".gameLink").forEach(link => {
+document.addEventListener("click", (e) => {
+  const link = e.target.closest(".gameLink");
+  if (!link) return;
 
-  link.addEventListener("click", (e) => {
+  const id = link.dataset.id;
 
-    const id = link.dataset.id;
+  // track plays
+  let plays = Number(localStorage.getItem("plays_" + id)) || 0;
+  plays++;
+  localStorage.setItem("plays_" + id, plays);
 
-    // track plays (unchanged logic)
-    let plays = Number(localStorage.getItem("plays_" + id)) || 0;
-    plays++;
-    localStorage.setItem("plays_" + id, plays);
+  const useAB = localStorage.getItem("aboutBlank") === "true";
+  if (!useAB) return;
 
-    // check toggle
-    const useAB = localStorage.getItem("aboutBlank") === "true";
+  e.preventDefault();
 
-    if (!useAB) return; // let normal link behavior happen
+  const url = link.href;
 
-    // STOP normal navigation
-    e.preventDefault();
+  const win = window.open("about:blank", "_blank");
+  if (!win) return;
 
-    const url = link.href;
+  // wait for tab to be ready
+  win.document.body.style.margin = "0";
 
-    const win = window.open("about:blank", "_blank");
+  const iframe = win.document.createElement("iframe");
+  iframe.src = url;
+  iframe.style.border = "none";
+  iframe.style.width = "100vw";
+  iframe.style.height = "100vh";
 
-    win.document.write(`
-      <iframe src="${url}" 
-      style="border:none;margin:0;padding:0;width:100vw;height:100vh;"
-      allowfullscreen>
-      </iframe>
-    `);
+  win.document.body.appendChild(iframe);
 
-    win.document.title = "Google Classroom";
-  });
-
+  // optional stealth
+  win.document.title = "Google Classroom";
 });
 
 
