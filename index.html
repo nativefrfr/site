@@ -1,225 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<html>
-    <head>
-        <style>
-            h1 {
-                text-align: center;
-                color: rgb(24, 120, 184);
-                font-family: "Comic Sans MS", "Comic Sans", "cursive";
-                font-size: 50px;
-                margin-top:-25px;
-                text-shadow: -1px -1px 0 #93d7ff, 1px -1px 0 #bef7ff, -1px 1px 0 #78d9ff, 1px 1px 0 #d3d3d3;
-            }
-            .p{
-                text-align: bottom;
-                font-size: 20px;
-                margin-top:15px;
-            }
-            .lefttext{
-                text-align: left;
-                color: rgb(0, 0, 0);
-                font-family: 'Trebuchet MS', sans-serif;
-                font-size: 20px;
+  <meta property="og:title" content="native">
+  <meta property="og:url" content="https://native.beer">
+  <meta property="og:description" content="about me!">
+  <meta name="theme-color" content="#0069f2">
 
-            }
-            .about{
-                text-align: center;
-                color: rgb(19, 83, 121);
-                font-family: 'Trebuchet MS', sans-serif;
-                font-size: 30px;
-                margin-top:-15px;
-                
-            }
-            .languages{
-                text-align: left;
-                color: rgb(19, 83, 121);
-                font-family: 'Trebuchet MS', sans-serif;
-                font-size: 30px;
-                margin-top:-30px;
-                
-            }
-            .hottext{
-                text-align: center;
-                color: rgb(19, 83, 121);
-                font-family: 'Trebuchet MS', sans-serif;
-                font-size: 30px;
-                margin:0;
-                margin-top:10px;
-                
-            }
-            .icon{
-                width: 30px;
-                height: 30px;
-                float: left ;
-                margin-bottom: 20px;
-                margin-left: 10px;
-            }
-            .out {
-                width: 800px;
-                height: 600px;
-                background-color: rgb(117, 184, 204);
-                padding: 50px;
-                margin: 20px;
-                border-radius: 50px;
-                display:block;
-                margin:auto;
-            }
-            .inner {
-                width: 800px;
-                height: 600px;
-                background-color: rgb(143, 211, 231);
-                padding: 50px;
-                margin: 20px;
-                border-radius: 50px;
-                display:block;
-                margin-left:-25px;
-                margin-top:-25px;
-                
-            }
-            p{
-                margin-left: -15px;
-                font-family: 'Trebuchet MS', sans-serif;
-            }
-            .textbox {
-                width: 250px;
-                height: 125px;
-                background-color: rgb(117, 184, 204);
-                padding: 50px;
-                margin: 20px;
-                border-radius: 20px;
-                display:block;
-                margin-left:-25px;
-            }
-            .textboxsmall {
-                width: 350px;
-                height: 100px;
-                background-color: rgb(117, 184, 204);
-                margin: 20px;
-                border-radius: 20px;
-                display:flex;
-                margin-left:-25px;
-                justify-content: center;
-                align-items: center;
-                flex-direction: column;
-            }
-            .slider{
-                width: 300px;
-                height: 9px;
-                background-color: rgb(41, 48, 49);
-                padding: 1px;
-                margin: auto;
-                border-radius: 20px;
-                display:flex;
-                margin-left: middle;
-                margin-top: 0px;
-                position: relative;
-            }
-            .sliderfat{
-                width: 300px;
-                height: 10px;
-                background-color: rgb(11, 20, 22);
-                padding: 4px;
-                margin: auto;
-                border-radius: 20px;
-                display:flex;
-                margin-left: middle;
-                margin-top: 10px;
-                position: relative;
-            }
-            .ball{
-                width: 30px;
-                height: 30px;
-                background-color: rgb(180, 0, 0);
-                border-radius: 50%;
-                position: absolute;
-                display:flex;
-                top: 50%;
-                left: 250;
-                transform: translateY(-50%);
-                justify-content: right;
-                align-items: center;
-            }
+  <title>chudatron</title>
 
-            button{
-                background-color: rgb(125, 193, 202);
-                width: 200px;
-                height: 50px;
-                font-size: 20px;
-                border: none;
-                border-radius: 10px;
-                outline: none;
-                box-shadow: none;
-                appearance: none;
-            }
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
 
-            button:hover{
-                transition: background-color 0.2s ease;
-                background-color: rgb(95, 163, 172);
-                width: 200px;
-                height: 50px;
-                font-size: 20px;
-                border: none;
-                border-radius: 10px;
-                outline: none;
-                box-shadow: none;
-                appearance: none;
-            }
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      padding: 30px;
+    }
 
-            button:active{
-                background-color: rgb(84, 131, 138);
-                width: 220px;
-                height: 60px;
-                font-size: 20px;
-                border: none;
-                border-radius: 10px;
-                outline: none;
-                box-shadow: none;
-                appearance: none;
-            }
-        </style>
-    <div class="out">
-        <div class="inner">
-            <body style="background-color: #b1daf5;"></body>
-            <h1>Native</h1>
-            <h1 class="about">ABOUT ME</h1>
-            <div class="textbox">
-                <h1 class="languages">Languages I know</h1>
-                <img class="icon" src="./assets/py.webp"alt="py"style="display:block; margin:auto;">
-                <p class="lefttext">⠀python</p>
-                <img class="icon" src="./assets/html.png"alt="py"style="display:block; margin:auto;">
-                <p class="lefttext">⠀html</p>
-                <img class="icon" src="./assets/css.png"alt="py"style="display:block; margin:auto;">
-                <p class="lefttext">⠀css</p>
-            </div>
-            <div class="textbox" style=margin-left:475px;margin-top:-245px;>
-                <h1 class="languages">Strengths</h1>
-                <p class="p" style="font-size: 15px;">I do api stuff and i hack games<br><br>I like messing with apps and games<br><br>I code
-                </p>
-            </div>
-            <div class="textbox" style=margin-left:475px;>
-                <h1 class="languages">Stuff I have done</h1>
-                <p class="p" style="font-size: 15px;">I breached yeep's api to do things no normal player could normally. I relayed this info to the devs and got it fixed<br><br>I've created multiple personal passion projects, mainly in python
-                </p>
-            </div>
-            <div class="textboxsmall" style="margin-top:-125px;">
-                <button onclick="window.location.href='https://native.beer/yeepstracker'">
-                    free fortnite cheats
-                </button>
-            </div>
-            <div class="textboxsmall"style="margin-top:-245px;">
-                <h1 class="hottext">hotness meter</h1>
-                <div class="sliderfat">
-                    <div class="slider">
-                        <div class="ball">
-                            <p class="p">🔥</p>
-                        </div>
-                    </div>
-                </div>
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
 
+    header h1 {
+      font-size: 3rem;
+    }
 
-            </div>
-    </div>
-    </head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
-     crossorigin="anonymous"></script>
-    </html>
+    header p {
+      color: #aaa;
+      margin-top: 10px;
+    }
+
+    .controls {
+      max-width: 600px;
+      margin: 0 auto 30px auto;
+    }
+
+    .search {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 1px solid #222;
+      background: #111;
+      color: #fff;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: #161616;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      border: 2px solid #222;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+      width: auto;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border: 2px solid #333;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+    }
+
+    .card p {
+      color: #aaa;
+      font-size: 0.95rem;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      border-radius: 8px;
+      background: #222;
+      color: #ccc;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      color: #666;
+      font-size: 0.85rem;
+    }
+    .native {
+        transition: 0.3s ease;
+    }
+
+    .native:hover {
+        color: #5d7f92;
+    }
+
+    .github-card {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px;
+    width: fit-content;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    font-family: system-ui, sans-serif;
+    display:grid;
+    }
+    .github-card-holder {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px;
+    width: fit-content;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    font-family: system-ui, sans-serif;
+    display:flex;
+    }
+
+    .github-card-holder-wrapper {
+    display: flex;
+    justify-content: center; /* horizontal center */
+    margin-top: 40px;        /* optional spacing from header */
+    }
+
+    .github-card h2 {
+    color: #c9d1d9;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+    }
+
+    .github-card img {
+    display: block;
+    image-rendering: pixelated;
+    }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 class="native">Native</h1>
+  <p>random stuff im working on</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" class="search" placeholder="search projects...">
+</div>
+
+<div class="grid" id="projectGrid"></div>
+
+<footer>
+  hi
+</footer>
+<div class="github-card-holder-wrapper">
+  <div class="github-card-holder">
+      <div class="github-card">
+        <h2>GitHub Activity</h2>
+        <img src="https://ghchart.rshah.org/nativefrfr" alt="GitHub contributions" />
+      </div>
+      <div class="github-card" style="width:200px; height:200px; margin-left: 10px; align-items: center;">
+        <h2 style="margin-top:-20px;">nativefrfr</h2>
+        <img src="https://avatars.githubusercontent.com/u/116759787?v=4" alt="github pfp" style="width:150px; height:150px; margin-top:-15px;" />
+      </div>
+  </div>
+</div>
+<script>
+  const projects = [
+    {
+      name: "Native G*mes",
+      url: "https://native.beer/work",
+      desc: "some game site ive been working on",
+      color: "#0099ff",
+      tag: "website"
+    },
+    {
+      name: "my github!",
+      url: "https://github.com/nativefrfr",
+      desc: "where I put my projects",
+      color: "#ffffff",
+      tag: "github"
+    },
+  ];
+
+  const grid = document.getElementById("projectGrid");
+  const search = document.getElementById("search");
+
+  function createCard(project) {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="dot" style="background:${project.color || '#00ffcc'}"></div>
+        <h2>${project.name}</h2>
+      </div>
+      <p>${project.desc || 'click to open'}</p>
+      ${project.tag ? `<span class="tag">${project.tag}</span>` : ""}
+    `;
+
+    card.onclick = () => window.open(project.url, "_blank");
+
+    return card;
+  }
+
+  function render(list) {
+    grid.innerHTML = "";
+    list.forEach(p => grid.appendChild(createCard(p)));
+  }
+
+  search.addEventListener("input", () => {
+    const q = search.value.toLowerCase();
+    const filtered = projects.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.desc && p.desc.toLowerCase().includes(q)) ||
+      (p.tag && p.tag.toLowerCase().includes(q))
+    );
+    render(filtered);
+  });
+
+  render(projects);
+</script>
+
+</body>
+</html>
