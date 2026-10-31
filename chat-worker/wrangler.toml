@@ -1,0 +1,24 @@
+name = "native-chat"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+# chatapp.native.beer points straight at this worker (native.beer must be on Cloudflare)
+routes = [
+  { pattern = "chatapp.native.beer", custom_domain = true }
+]
+
+[vars]
+# set to "false" and redeploy to switch chat off everywhere
+CHAT_ENABLED = "true"
+# pages allowed to connect (comma separated)
+ALLOWED_ORIGINS = "https://native.beer,https://www.native.beer,http://localhost:8765"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "ChatRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChatRoom"]
+
+# admin password: run `npx wrangler secret put ADMIN_KEY`

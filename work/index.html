@@ -925,12 +925,275 @@ main{
     background:#c73338;
 }
 
+/* CHAT */
+
+.chatFab{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:950;
+    width:56px;
+    height:56px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #000));
+    color:white;
+    cursor:pointer;
+    display:grid;
+    place-items:center;
+    box-shadow:0 10px 28px color-mix(in srgb, var(--accent) 45%, transparent);
+    transition:transform 0.2s;
+}
+
+.chatFab:hover{
+    transform:translateY(-3px) rotate(-4deg);
+}
+
+.chatFab svg{
+    width:26px;
+    height:26px;
+}
+
+.chatBadge{
+    position:absolute;
+    top:-6px;
+    right:-6px;
+    min-width:22px;
+    height:22px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#e5484d;
+    color:white;
+    font-size:12px;
+    font-weight:800;
+    display:none;
+    place-items:center;
+    border:2px solid var(--bg);
+}
+
+.chatPanel{
+    position:fixed;
+    right:20px;
+    bottom:88px;
+    z-index:960;
+    width:min(370px, calc(100vw - 32px));
+    height:min(540px, calc(100vh - 120px));
+    display:flex;
+    flex-direction:column;
+    background:color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--border);
+    border-radius:20px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.45);
+    overflow:hidden;
+    transform-origin:bottom right;
+    transition:transform 0.25s cubic-bezier(.2,.8,.2,1), opacity 0.2s;
+}
+
+.chatPanel.hidden{
+    transform:scale(0.85) translateY(20px);
+    opacity:0;
+    pointer-events:none;
+}
+
+.chatHead{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 14px 12px 16px;
+    border-bottom:1px solid var(--border);
+}
+
+.chatHead h3{
+    margin:0;
+    font-size:16px;
+}
+
+.chatStatus{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--muted);
+}
+
+.chatDot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#888;
+}
+
+.chatDot.on{
+    background:#22c55e;
+    box-shadow:0 0 8px #22c55e;
+}
+
+.chatHead .iconBtn{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    margin-left:auto;
+}
+
+.chatRoom{
+    display:flex;
+    gap:6px;
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+}
+
+.chatRoom .field{
+    padding:7px 10px;
+    font-size:13px;
+}
+
+.chatRoom button{
+    padding:0 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text);
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.chatLog{
+    flex:1;
+    overflow-y:auto;
+    padding:12px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.chatMsg{
+    max-width:85%;
+    align-self:flex-start;
+    animation:msgIn 0.2s ease-out;
+}
+
+.chatMsg.mine{
+    align-self:flex-end;
+    text-align:right;
+}
+
+@keyframes msgIn{
+    from{ opacity:0; transform:translateY(6px); }
+}
+
+.chatName{
+    font-size:11px;
+    font-weight:700;
+    color:var(--muted);
+    margin:0 4px 3px;
+}
+
+.chatName .adminTag{
+    color:var(--accent);
+}
+
+.chatName .kick{
+    margin-left:6px;
+    border:none;
+    background:none;
+    color:#e5484d;
+    cursor:pointer;
+    font-size:11px;
+    font-weight:800;
+    padding:0;
+}
+
+.chatBubble{
+    display:inline-block;
+    padding:8px 12px;
+    border-radius:14px 14px 14px 4px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    font-size:14px;
+    line-height:1.4;
+    word-break:break-word;
+    text-align:left;
+}
+
+.chatMsg.mine .chatBubble{
+    border-radius:14px 14px 4px 14px;
+    background:var(--accent);
+    border-color:var(--accent);
+    color:white;
+}
+
+.chatSystem{
+    align-self:center;
+    font-size:11.5px;
+    color:var(--muted);
+    padding:2px 10px;
+    border-radius:999px;
+    background:var(--surface-2);
+}
+
+.chatSystem.err{
+    color:#e5484d;
+}
+
+.chatEmpty{
+    margin:auto;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.5;
+    padding:20px;
+}
+
+.chatForm{
+    display:flex;
+    gap:8px;
+    padding:12px 14px 14px;
+    border-top:1px solid var(--border);
+}
+
+.chatForm input{
+    flex:1;
+    border-radius:999px;
+    padding:10px 14px;
+}
+
+.chatForm button{
+    width:42px;
+    height:42px;
+    flex-shrink:0;
+    border:none;
+    border-radius:50%;
+    background:var(--accent);
+    color:white;
+    cursor:pointer;
+    display:grid;
+    place-items:center;
+}
+
+.chatForm button:disabled{
+    opacity:0.4;
+}
+
+.chatForm svg{
+    width:18px;
+    height:18px;
+}
+
+html.nochat .chatFab,
+html.nochat .chatPanel{
+    display:none;
+}
+
 /* NOTIFICATIONS */
 
 .notifWrap{
     position:fixed;
     right:20px;
-    bottom:20px;
+    bottom:92px;
     width:min(340px, calc(100vw - 32px));
     display:flex;
     flex-direction:column;
@@ -1292,7 +1555,19 @@ html.nofx .spotlight{
     }
     .notifWrap{
         right:16px;
+        bottom:84px;
+    }
+    .chatFab{
+        right:16px;
         bottom:16px;
+    }
+    .chatPanel{
+        right:0;
+        bottom:0;
+        width:100vw;
+        height:85vh;
+        border-radius:20px 20px 0 0;
+        transform-origin:bottom center;
     }
 }
 </style>
@@ -1402,6 +1677,12 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
             </div>
             <div class="row">
                 <label class="checkbox4">
+                    <input type="checkbox" id="chatToggle">
+                    Network chat
+                </label>
+            </div>
+            <div class="row">
+                <label class="checkbox4">
                     <input type="checkbox" id="panicToggle">
                     Show "leave site quickly" button
                 </label>
@@ -1488,6 +1769,42 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
 <div class="empty" id="empty">No games found 😢</div>
 
 </main>
+
+<script>
+// apply saved chat setting before paint
+if(localStorage.getItem("chatOn") === "false") document.documentElement.classList.add("nochat")
+</script>
+
+<!-- CHAT -->
+<button class="chatFab" id="chatFab" aria-label="Open chat" title="Chat with people on your network">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+    <span class="chatBadge" id="chatBadge"></span>
+</button>
+
+<div class="chatPanel hidden" id="chatPanel" role="dialog" aria-label="Network chat">
+    <div class="chatHead">
+        <div>
+            <h3 id="chatTitle">Network chat</h3>
+            <div class="chatStatus"><span class="chatDot" id="chatDot"></span><span id="chatStatus">Connecting…</span></div>
+        </div>
+        <button class="iconBtn" id="chatClose" aria-label="Close chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="chatRoom">
+        <input class="field" id="chatRoomCode" placeholder="Room code (blank = your network)" maxlength="20" autocomplete="off">
+        <button id="chatJoin">Join</button>
+    </div>
+    <div class="chatLog" id="chatLog">
+        <div class="chatEmpty" id="chatEmpty">Chat with people on the same network.<br>Messages aren't saved. Be nice!<br><br>Type <b>/name YourName</b> to change your name.</div>
+    </div>
+    <form class="chatForm" id="chatForm" autocomplete="off">
+        <input class="field" id="chatInput" placeholder="Say something…" maxlength="300">
+        <button id="chatSend" aria-label="Send">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg>
+        </button>
+    </form>
+</div>
 
 <div class="classroomBtn" id="classroombutton" onclick="window.location='https://classroom.google.com/'">
 leave site quickly
@@ -2910,7 +3227,7 @@ settingsOverlay.addEventListener("click",(e)=>{
 })
 
 document.addEventListener("keydown",(e)=>{
-    if(e.key==="Escape") closeSettings()
+    if(e.key==="Escape") { closeSettings(); chatCloseFn() }
 })
 
 // tab disguise
@@ -2971,6 +3288,218 @@ document.getElementById("clearStorage").onclick=()=>{
     localStorage.clear()
     location.reload()
 }
+
+
+/* NETWORK CHAT */
+
+const CHAT_URL = location.hostname === "localhost" ? "ws://localhost:8787/ws" : "wss://chatapp.native.beer/ws"
+
+const chatFab = document.getElementById("chatFab")
+const chatPanel = document.getElementById("chatPanel")
+const chatLog = document.getElementById("chatLog")
+const chatEmpty = document.getElementById("chatEmpty")
+const chatForm = document.getElementById("chatForm")
+const chatInput = document.getElementById("chatInput")
+const chatBadge = document.getElementById("chatBadge")
+const chatDot = document.getElementById("chatDot")
+const chatStatus = document.getElementById("chatStatus")
+const chatTitle = document.getElementById("chatTitle")
+const chatRoomCode = document.getElementById("chatRoomCode")
+const chatToggle = document.getElementById("chatToggle")
+
+let chatWs = null
+let chatMe = null
+let chatAdmin = false
+let chatUnread = 0
+let chatRetry = 0
+let chatRetryTimer = null
+let chatOnline = 0
+
+// random id so a kick sticks to this browser
+let chatCid = localStorage.getItem("chatCid")
+if (!chatCid) {
+    chatCid = crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)
+    localStorage.setItem("chatCid", chatCid)
+}
+
+chatRoomCode.value = localStorage.getItem("chatRoom") || ""
+
+function chatSetStatus(on, text){
+    chatDot.classList.toggle("on", on)
+    chatStatus.innerText = text
+}
+
+function chatAdd(node){
+    chatEmpty.style.display = "none"
+    const atBottom = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight < 60
+    chatLog.appendChild(node)
+    // keep it light: only the last 150 lines
+    while (chatLog.children.length > 151) chatLog.children[1].remove()
+    if (atBottom) chatLog.scrollTop = chatLog.scrollHeight
+}
+
+function chatSystem(text, err){
+    const el = document.createElement("div")
+    el.className = "chatSystem" + (err ? " err" : "")
+    el.textContent = text
+    chatAdd(el)
+}
+
+function chatMessage(m){
+    const mine = chatMe && m.from.id === chatMe.id
+    const el = document.createElement("div")
+    el.className = "chatMsg" + (mine ? " mine" : "")
+
+    const name = document.createElement("div")
+    name.className = "chatName"
+    name.textContent = mine ? "You" : m.from.name
+    if (m.from.admin) {
+        const tag = document.createElement("span")
+        tag.className = "adminTag"
+        tag.textContent = " ★ admin"
+        name.appendChild(tag)
+    }
+    if (chatAdmin && !mine) {
+        const kick = document.createElement("button")
+        kick.className = "kick"
+        kick.textContent = "kick"
+        kick.onclick = () => chatSend({ type: "kick", id: m.from.id })
+        name.appendChild(kick)
+    }
+
+    const bubble = document.createElement("div")
+    bubble.className = "chatBubble"
+    bubble.textContent = m.text
+
+    el.appendChild(name)
+    el.appendChild(bubble)
+    chatAdd(el)
+
+    if (!mine && chatPanel.classList.contains("hidden")) {
+        chatUnread++
+        chatBadge.textContent = chatUnread > 9 ? "9+" : chatUnread
+        chatBadge.style.display = "grid"
+    }
+}
+
+function chatSend(obj){
+    if (chatWs && chatWs.readyState === 1) chatWs.send(JSON.stringify(obj))
+}
+
+function chatConnect(){
+    clearTimeout(chatRetryTimer)
+    if (chatWs) {
+        chatWs.onclose = null
+        chatWs.close()
+    }
+
+    const room = chatRoomCode.value.trim()
+    const name = localStorage.getItem("chatName") || ""
+    const url = `${CHAT_URL}?cid=${encodeURIComponent(chatCid)}&room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}`
+
+    chatSetStatus(false, "Connecting…")
+    chatWs = new WebSocket(url)
+
+    chatWs.onopen = () => {
+        chatRetry = 0
+    }
+
+    chatWs.onmessage = (e) => {
+        let m
+        try { m = JSON.parse(e.data) } catch { return }
+
+        if (m.type === "welcome") {
+            chatMe = m.you
+            chatOnline = m.online
+            chatTitle.innerText = m.room ? `Room: ${m.room}` : "Network chat"
+            chatSetStatus(true, `${chatOnline} online · you are ${chatMe.name}`)
+            if (m.locked) chatSystem("Chat is locked right now.")
+            const key = sessionStorage.getItem("chatAdminKey")
+            if (key) chatSend({ type: "admin", key })
+        }
+        else if (m.type === "msg") chatMessage(m)
+        else if (m.type === "system") chatSystem(m.text)
+        else if (m.type === "error") chatSystem(m.text, true)
+        else if (m.type === "online") {
+            chatOnline = m.n
+            if (chatMe) chatSetStatus(true, `${chatOnline} online · you are ${chatMe.name}`)
+        }
+        else if (m.type === "you") {
+            chatMe = { id: m.id, name: m.name }
+            localStorage.setItem("chatName", m.name)
+            chatSetStatus(true, `${chatOnline} online · you are ${chatMe.name}`)
+        }
+        else if (m.type === "admin") {
+            chatAdmin = true
+            chatSystem("Admin mode on. /lock, /unlock, or click kick on a message.")
+        }
+    }
+
+    chatWs.onclose = (e) => {
+        chatSetStatus(false, "Offline")
+        if (e.code === 4003) return // kicked, don't reconnect
+        // back off: 2s, 4s, 8s... up to 30s
+        chatRetry++
+        chatRetryTimer = setTimeout(chatConnect, Math.min(30000, 1000 * 2 ** chatRetry))
+    }
+}
+
+chatForm.onsubmit = (e) => {
+    e.preventDefault()
+    const text = chatInput.value.trim()
+    if (!text) return
+    chatInput.value = ""
+
+    // slash commands
+    const [cmd, ...rest] = text.split(" ")
+    const arg = rest.join(" ")
+    if (cmd === "/name") return chatSend({ type: "name", name: arg })
+    if (cmd === "/admin") {
+        sessionStorage.setItem("chatAdminKey", arg)
+        return chatSend({ type: "admin", key: arg })
+    }
+    if (cmd === "/lock" || cmd === "/unlock") return chatSend({ type: cmd.slice(1) })
+
+    if (!chatWs || chatWs.readyState !== 1) return chatSystem("Not connected yet.", true)
+    chatSend({ type: "msg", text })
+}
+
+function chatOpen(){
+    chatPanel.classList.remove("hidden")
+    chatUnread = 0
+    chatBadge.style.display = "none"
+    chatLog.scrollTop = chatLog.scrollHeight
+    setTimeout(() => chatInput.focus(), 200)
+}
+
+function chatCloseFn(){
+    chatPanel.classList.add("hidden")
+}
+
+chatFab.onclick = () => chatPanel.classList.contains("hidden") ? chatOpen() : chatCloseFn()
+document.getElementById("chatClose").onclick = chatCloseFn
+
+document.getElementById("chatJoin").onclick = () => {
+    localStorage.setItem("chatRoom", chatRoomCode.value.trim())
+    chatLog.querySelectorAll(".chatMsg, .chatSystem").forEach(el => el.remove())
+    chatEmpty.style.display = ""
+    chatConnect()
+}
+
+chatToggle.checked = localStorage.getItem("chatOn") !== "false"
+chatToggle.onchange = () => {
+    localStorage.setItem("chatOn", chatToggle.checked)
+    document.documentElement.classList.toggle("nochat", !chatToggle.checked)
+    if (chatToggle.checked) {
+        chatConnect()
+    } else {
+        clearTimeout(chatRetryTimer)
+        if (chatWs) { chatWs.onclose = null; chatWs.close() }
+        chatSetStatus(false, "Off")
+    }
+}
+
+if (chatToggle.checked) chatConnect()
 
 
 /* NOTIFICATIONS (DISCORD STYLE) */
