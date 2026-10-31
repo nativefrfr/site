@@ -649,6 +649,138 @@ html.offline .notifWrap{
     backdrop-filter:none;
 }
 
+/* RECENTLY PLAYED */
+
+.recentRow{
+    margin-bottom:20px;
+    background:color-mix(in srgb, var(--surface) 80%, transparent);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+.recentRow.empty,
+.searching .recentRow{
+    display:none;
+}
+
+.recentList{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:thin;
+}
+
+.recentItem{
+    position:relative;
+    flex:0 0 150px;
+    display:flex;
+    flex-direction:column;
+    border-radius:12px;
+    overflow:hidden;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    text-decoration:none;
+    transition:transform 0.15s, border-color 0.15s;
+}
+
+.recentItem:hover{
+    transform:translateY(-3px);
+    border-color:var(--accent);
+}
+
+.recentItem .thumb{
+    animation:none;
+}
+
+.recentItem .gameTitle{
+    padding:8px 10px 2px;
+    font-size:12.5px;
+}
+
+.recentItem small{
+    padding:0 10px 8px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.linkBtn{
+    border:none;
+    background:none;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    padding:0;
+}
+
+.linkBtn:hover{
+    color:var(--accent);
+}
+
+.chip.random{
+    background:linear-gradient(135deg, #ffb703, #fb5607);
+    border-color:transparent;
+    color:white;
+}
+
+.hero .chip.random:hover{
+    background:linear-gradient(135deg, #ffc533, #ff6d2a);
+}
+
+.chip.random.roll{
+    animation:roll 0.5s ease-in-out;
+}
+
+@keyframes roll{
+    50%{ transform:rotate(-8deg) scale(1.08); }
+}
+
+/* YOUR STATS */
+
+.statGrid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:8px;
+}
+
+.stat{
+    padding:12px;
+    border-radius:12px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    min-width:0;
+}
+
+.stat b{
+    display:block;
+    font-size:20px;
+    font-weight:800;
+    color:var(--accent);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.stat span{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:600;
+}
+
+kbd{
+    font-family:ui-monospace,monospace;
+    font-size:12px;
+    padding:1px 6px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+}
+
 /* key picker for the panic key */
 .keyBtn{
     min-width:90px;
@@ -2110,8 +2242,14 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
         </div>
 
         <div class="section">
+            <h3>Your stats</h3>
+            <p>Only stored in this browser.</p>
+            <div class="statGrid" id="statGrid"></div>
+        </div>
+
+        <div class="section">
             <h3>Help</h3>
-            <p>New here or forgot where things are?</p>
+            <p>Shortcuts: <kbd>/</kbd> search, <kbd>R</kbd> random game, <kbd>Esc</kbd> close.</p>
             <button class="ghostBtn" id="replayTour">Replay the tour</button>
         </div>
 
@@ -2132,7 +2270,7 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
     <div class="searchWrap">
         <div class="searchField">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            <input id="search" placeholder="Search for games!" autocomplete="off">
+            <input id="search" placeholder="Search for games!  ( / )" autocomplete="off">
             <button class="clearBtn" id="clear" aria-label="Clear search">✕</button>
         </div>
     </div>
@@ -2160,6 +2298,7 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
         <button class="chip active" id="allbutton">All games</button>
         <button class="chip" id="pcbutton">💻 PC</button>
         <button class="chip" id="tabletbutton">📱 Mobile</button>
+        <button class="chip random" id="randomBtn" title="Play a random game (R)">🎲 Random</button>
         <select class="sortSelect" id="sortSelect" aria-label="Sort games">
             <option value="yours">Sort: Your plays</option>
             <option value="global">Sort: Most played globally</option>
@@ -2203,6 +2342,10 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
         <div class="favList" id="favList"></div>
     </section>
     <div>
+        <section class="recentRow empty" id="recentRow" aria-label="Recently played">
+            <div class="favHead"><h2>🕒 Jump back in</h2><button class="linkBtn" id="clearRecent">Clear</button></div>
+            <div class="recentList" id="recentList"></div>
+        </section>
         <div class="games" id="games"></div>
         <div class="empty" id="empty">No games found 😢</div>
     </div>
@@ -3219,6 +3362,8 @@ const card=document.createElement("a")
 card.className="game gameLink"
 card.dataset.id=g[1]
 card.dataset.name=name.toLowerCase()
+// letters and numbers only, so "geometrydash" finds "geometry dash" and "1v1" finds "1v1.lol"
+card.dataset.flat=name.toLowerCase().replace(/[^a-z0-9]/g, "")
 card.dataset.pc=pc || !tagged
 card.dataset.mobile=mobile || !tagged
 card.dataset.order=container.children.length
@@ -3313,6 +3458,58 @@ setFavPosition(localStorage.getItem("favPosition") || "top")
 renderFavourites()
 
 
+/* RECENTLY PLAYED */
+
+const recentRow = document.getElementById("recentRow")
+const recentList = document.getElementById("recentList")
+
+let recent = []
+try { recent = JSON.parse(localStorage.getItem("recent") || "[]") } catch {}
+recent = recent.filter(r => gameById.has(r.id))
+
+function timeAgo(t){
+    const mins = Math.round((Date.now() - t) / 60000)
+    if (mins < 1) return "just now"
+    if (mins < 60) return `${mins}m ago`
+    const hours = Math.round(mins / 60)
+    if (hours < 24) return `${hours}h ago`
+    const days = Math.round(hours / 24)
+    return days === 1 ? "yesterday" : `${days} days ago`
+}
+
+function renderRecent(){
+    recentList.innerHTML = ""
+    recent.forEach(r => {
+        const card = cardFor(r.id)
+        const item = document.createElement("a")
+        item.className = "recentItem gameLink"
+        item.dataset.id = r.id
+        item.href = card.href
+        item.innerHTML = `
+<div class="thumb"><img src="./assets/${r.id}.png?v=3" alt="" onload="this.classList.add('loaded')" onerror="this.style.visibility='hidden'"></div>
+<span class="gameTitle"></span>
+<small>${timeAgo(r.t)}</small>`
+        item.querySelector(".gameTitle").textContent = card.querySelector(".gameTitle").textContent
+        recentList.appendChild(item)
+    })
+    recentRow.classList.toggle("empty", recent.length === 0)
+}
+
+function addRecent(id){
+    recent = [{ id, t: Date.now() }, ...recent.filter(r => r.id !== id)].slice(0, 12)
+    localStorage.setItem("recent", JSON.stringify(recent))
+    renderRecent()
+}
+
+document.getElementById("clearRecent").onclick = () => {
+    recent = []
+    localStorage.removeItem("recent")
+    renderRecent()
+}
+
+renderRecent()
+
+
 /* SORTING + GLOBAL STATS */
 
 const STATS_URL = location.hostname === "localhost" ? "http://localhost:8787" : "https://chatapp.native.beer"
@@ -3353,7 +3550,7 @@ function sortGames(){
 sortSelect.value = localStorage.getItem("sort") || "yours"
 sortSelect.onchange = () => {
     localStorage.setItem("sort", sortSelect.value)
-    sortGames()
+    filterGames() // re-sorts, and keeps search results ranked
     window.scrollTo({ top: document.querySelector(".hero").offsetTop + document.querySelector(".hero").offsetHeight - 60, behavior: "smooth" })
 }
 sortGames()
@@ -3372,7 +3569,7 @@ async function loadStats(){
     })
 
     container.classList.add("statsLoaded")
-    if (sortSelect.value !== "yours" && sortSelect.value !== "az") sortGames()
+    if (sortSelect.value !== "yours" && sortSelect.value !== "az") filterGames()
 }
 
 if (OFFLINE) {
@@ -3611,6 +3808,7 @@ document.addEventListener("click", (e) => {
   card.querySelector(".playCount").innerText = `Your plays: ${plays}`;
   card.querySelector(".playCount").classList.add("played");
   countGlobalPlay(id);
+  addRecent(id);
 
   // let ctrl/cmd/shift/middle clicks open normally
   if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
@@ -3680,16 +3878,76 @@ const empty=document.getElementById("empty")
 
 let device = "all"
 
+// typo tolerant search: smallest number of edits (wrong, missing, extra or swapped letter)
+// needed to make the query appear anywhere inside the name
+function fuzzyDistance(query, text){
+    const m = query.length
+    const n = text.length
+    let prev2 = null
+    let prev = new Array(n + 1).fill(0) // a match can start anywhere in the name
+    for (let i = 1; i <= m; i++) {
+        const row = new Array(n + 1)
+        row[0] = i
+        for (let j = 1; j <= n; j++) {
+            const cost = query[i - 1] === text[j - 1] ? 0 : 1
+            let best = Math.min(prev[j] + 1, row[j - 1] + 1, prev[j - 1] + cost)
+            // swapped neighbours ("geomtery") count as one mistake
+            if (prev2 && i > 1 && j > 1 && query[i - 1] === text[j - 2] && query[i - 2] === text[j - 1]) {
+                best = Math.min(best, prev2[j - 2] + 1)
+            }
+            row[j] = best
+        }
+        prev2 = prev
+        prev = row
+    }
+    return Math.min(...prev)
+}
+
+// how many mistakes we allow depends on how much has been typed
+function allowedTypos(length){
+    if (length <= 3) return 0
+    if (length <= 6) return 1
+    return 2
+}
+
+// lower = better match, Infinity = no match
+function matchScore(card, query, flat){
+    const name = card.dataset.name
+    if (name.startsWith(query)) return 0
+    if (name.includes(query)) return 0.5
+    if (!flat) return Infinity
+    if (card.dataset.flat.includes(flat)) return 0.75
+    const allowed = allowedTypos(flat.length)
+    if (!allowed) return Infinity
+    const d = fuzzyDistance(flat, card.dataset.flat)
+    return d <= allowed ? d : Infinity
+}
+
 function filterGames(){
     const query = search.value.toLowerCase().trim();
+    const flat = query.replace(/[^a-z0-9]/g, "");
+    library.classList.toggle("searching", query !== "");
+
+    // start from the chosen sort, then put the best matches first
+    sortGames();
+    const scores = new Map();
+
     document.querySelectorAll(".game").forEach(card => {
         const deviceOk = device === "all" || card.dataset[device] === "true";
-        if (card.dataset.name.includes(query) && deviceOk) {
+        const score = query ? matchScore(card, query, flat) : 0;
+        if (score !== Infinity && deviceOk) {
             card.style.display = "";
+            scores.set(card, score);
         } else {
             card.style.display = "none";
         }
     });
+
+    if (query) {
+        [...scores.keys()]
+            .sort((a, b) => scores.get(a) - scores.get(b))
+            .forEach(card => container.appendChild(card));
+    }
 
     // highlight the matching filter chip
     allbutton.classList.toggle("active", device === "all");
@@ -3989,6 +4247,72 @@ fxToggle.onchange = () => {
 }
 
 
+/* RANDOM GAME + SHORTCUTS */
+
+const randomBtn = document.getElementById("randomBtn")
+
+function playRandom(){
+    // picks from whatever the current search / filter shows
+    const visible = [...container.querySelectorAll(".game")].filter(c => c.style.display !== "none")
+    if (!visible.length) return
+    randomBtn.classList.remove("roll")
+    void randomBtn.offsetWidth
+    randomBtn.classList.add("roll")
+    visible[Math.floor(Math.random() * visible.length)].click()
+}
+
+randomBtn.onclick = playRandom
+
+document.addEventListener("keydown", (e) => {
+    // the panic key picker already used this key press
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
+    if (e.target.closest("input, textarea, select, [contenteditable]")) return
+    if (e.key === "/") {
+        e.preventDefault()
+        search.focus()
+        search.select()
+    } else if (e.key === "r" || e.key === "R") {
+        playRandom()
+    }
+})
+
+
+/* YOUR STATS */
+
+const statGrid = document.getElementById("statGrid")
+
+function renderStats(){
+    let total = 0
+    let tried = 0
+    let top = null
+    container.querySelectorAll(".game").forEach(card => {
+        const n = Number(card.dataset.plays)
+        if (!n) return
+        total += n
+        tried++
+        if (!top || n > Number(top.dataset.plays)) top = card
+    })
+
+    const tiles = [
+        [shortNum(total), "total plays"],
+        [`${tried} / ${games.length}`, "games tried"],
+        [String(favourites.length), "favourites"],
+        [top ? top.querySelector(".gameTitle").textContent : "—", top ? `most played (${top.dataset.plays})` : "most played"]
+    ]
+
+    statGrid.innerHTML = ""
+    tiles.forEach(([value, label]) => {
+        const el = document.createElement("div")
+        el.className = "stat"
+        el.innerHTML = "<b></b><span></span>"
+        el.querySelector("b").textContent = value
+        el.querySelector("b").title = value
+        el.querySelector("span").textContent = label
+        statGrid.appendChild(el)
+    })
+}
+
+
 /* SETTINGS */
 
 const settingsOverlay=document.getElementById("settingsOverlay")
@@ -3999,6 +4323,7 @@ const cloakIcon=document.getElementById("cloakIcon")
 const swatches=document.getElementById("swatches")
 
 function openSettings(){
+    renderStats()
     settingsOverlay.classList.remove("hidden")
 }
 
