@@ -54,6 +54,11 @@ const ACCENTS = {
     pink:   "#ec4899"
 };
 document.documentElement.style.setProperty("--accent", ACCENTS[localStorage.getItem("accent")] || ACCENTS.blue);
+
+/* CARD SIZE + OFFLINE MODE (applied early so the layout doesn't jump) */
+document.documentElement.dataset.size = localStorage.getItem("cardSize") || "normal";
+const OFFLINE = localStorage.getItem("offline") === "true";
+if (OFFLINE) document.documentElement.classList.add("offline");
 </script>
 
 <style>
@@ -434,8 +439,237 @@ main{
 
 .games{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(var(--cardMin),1fr));
     gap:18px;
+}
+
+:root{ --cardMin:190px; --cardMinM:140px; }
+html[data-size="small"]{ --cardMin:150px; --cardMinM:115px; }
+html[data-size="large"]{ --cardMin:250px; --cardMinM:180px; }
+
+/* OFFLINE MODE: hide everything that needs the network */
+html.offline .globalPlays,
+html.offline .hotTag,
+html.offline .chatFab,
+html.offline .chatPanel,
+html.offline .notifWrap{
+    display:none !important;
+}
+
+/* FAVOURITES */
+
+.library{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:22px;
+    align-items:start;
+}
+
+.library[data-fav="left"]{
+    grid-template-columns:250px minmax(0,1fr);
+}
+
+.library[data-fav="right"]{
+    grid-template-columns:minmax(0,1fr) 250px;
+}
+
+.library[data-fav="right"] .favPanel{
+    order:2;
+}
+
+.library[data-fav="off"] .favPanel,
+.library.noFavs .favPanel{
+    display:none;
+}
+
+.library[data-fav="off"],
+.library.noFavs{
+    grid-template-columns:minmax(0,1fr);
+}
+
+.favPanel{
+    background:color-mix(in srgb, var(--surface) 80%, transparent);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    min-width:0;
+}
+
+.library[data-fav="left"] .favPanel,
+.library[data-fav="right"] .favPanel{
+    position:sticky;
+    top:84px;
+    max-height:calc(100vh - 104px);
+    overflow-y:auto;
+}
+
+.favHead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin:0 2px 12px;
+}
+
+.favHead h2{
+    margin:0;
+    font-size:16px;
+}
+
+.favHead span{
+    color:var(--muted);
+    font-size:12px;
+    font-weight:600;
+}
+
+/* top: a row of tiles you can scroll sideways */
+.favList{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:thin;
+}
+
+.favItem{
+    position:relative;
+    flex:0 0 170px;
+    display:flex;
+    flex-direction:column;
+    border-radius:12px;
+    overflow:hidden;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    text-decoration:none;
+    transition:transform 0.15s, border-color 0.15s;
+}
+
+.favItem:hover{
+    transform:translateY(-3px);
+    border-color:var(--accent);
+}
+
+.favItem .thumb{
+    animation:none;
+}
+
+.favItem .gameTitle{
+    padding:8px 10px;
+    font-size:12.5px;
+}
+
+/* left / right: a compact list */
+.library[data-fav="left"] .favList,
+.library[data-fav="right"] .favList{
+    flex-direction:column;
+    overflow:visible;
+    gap:8px;
+}
+
+.library[data-fav="left"] .favItem,
+.library[data-fav="right"] .favItem{
+    flex:none;
+    flex-direction:row;
+    align-items:center;
+}
+
+.library[data-fav="left"] .favItem .thumb,
+.library[data-fav="right"] .favItem .thumb{
+    width:72px;
+    flex-shrink:0;
+}
+
+.library[data-fav="left"] .favItem .gameTitle,
+.library[data-fav="right"] .favItem .gameTitle{
+    flex:1;
+    padding:6px 34px 6px 10px;
+}
+
+.favBtn{
+    position:absolute;
+    right:8px;
+    bottom:8px;
+    z-index:2;
+    width:32px;
+    height:32px;
+    border:none;
+    border-radius:50%;
+    background:rgba(10,12,16,0.65);
+    backdrop-filter:blur(4px);
+    color:white;
+    font-size:17px;
+    line-height:1;
+    cursor:pointer;
+    display:grid;
+    place-items:center;
+    opacity:0;
+    transform:scale(0.8);
+    transition:0.15s;
+}
+
+.game:hover .favBtn,
+.game:focus-within .favBtn,
+.favBtn.on{
+    opacity:1;
+    transform:none;
+}
+
+.favBtn.on{
+    color:#ffc83d;
+}
+
+.favBtn:hover{
+    transform:scale(1.12);
+}
+
+.favBtn.pop{
+    animation:favPop 0.35s ease-out;
+}
+
+@keyframes favPop{
+    50%{ transform:scale(1.4); }
+}
+
+.favItem .favBtn{
+    top:6px;
+    right:6px;
+    bottom:auto;
+    width:26px;
+    height:26px;
+    font-size:14px;
+}
+
+.library[data-fav="left"] .favItem .favBtn,
+.library[data-fav="right"] .favItem .favBtn{
+    top:50%;
+    margin-top:-13px;
+    background:transparent;
+    backdrop-filter:none;
+}
+
+/* key picker for the panic key */
+.keyBtn{
+    min-width:90px;
+    padding:9px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text);
+    font-weight:700;
+    font-family:ui-monospace,monospace;
+    cursor:pointer;
+}
+
+.keyBtn.listening{
+    border-color:var(--accent);
+    color:var(--accent);
+}
+
+.checkbox4.disabled{
+    opacity:0.45;
+    pointer-events:none;
 }
 
 /* CARD */
@@ -1630,8 +1864,43 @@ html.nofx .spotlight{
         padding:18px 16px 90px;
     }
     .games{
-        grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+        grid-template-columns:repeat(auto-fill,minmax(var(--cardMinM),1fr));
         gap:12px;
+    }
+    /* no room for a sidebar on phones: favourites always go on top */
+    .library[data-fav="left"],
+    .library[data-fav="right"]{
+        grid-template-columns:minmax(0,1fr);
+    }
+    .library[data-fav="right"] .favPanel{
+        order:0;
+    }
+    .library[data-fav="left"] .favPanel,
+    .library[data-fav="right"] .favPanel{
+        position:static;
+        max-height:none;
+    }
+    .library[data-fav="left"] .favList,
+    .library[data-fav="right"] .favList{
+        flex-direction:row;
+        overflow-x:auto;
+    }
+    .library[data-fav="left"] .favItem,
+    .library[data-fav="right"] .favItem{
+        flex:0 0 140px;
+        flex-direction:column;
+        align-items:stretch;
+    }
+    .library[data-fav="left"] .favItem .thumb,
+    .library[data-fav="right"] .favItem .thumb{
+        width:auto;
+    }
+    .favItem{
+        flex-basis:140px;
+    }
+    .favBtn{
+        opacity:1;
+        transform:none;
     }
     .gameTitle{
         font-size:12.5px;
@@ -1760,13 +2029,35 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
         </div>
 
         <div class="section">
-            <h3>Colour scheme</h3>
-            <p>Pick light or dark, and an accent colour.</p>
+            <h3>Look &amp; feel</h3>
+            <p>Light or dark, accent colour, and how big the game cards are.</p>
             <div class="segmented" id="themeSeg">
                 <button data-theme="dark">🌙 Dark</button>
                 <button data-theme="light">☀️ Light</button>
             </div>
             <div class="swatches" id="swatches"></div>
+            <div class="segmented" id="sizeSeg" style="margin-top:14px;">
+                <button data-size="small">Small cards</button>
+                <button data-size="normal">Normal</button>
+                <button data-size="large">Large</button>
+            </div>
+            <div class="row" style="margin-top:10px;">
+                <label class="checkbox4">
+                    <input type="checkbox" id="fxToggle">
+                    Background animations (turn off if laggy)
+                </label>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Favourites</h3>
+            <p>Tap the ☆ on a game to favourite it. Choose where your favourites show up.</p>
+            <div class="segmented" id="favSeg">
+                <button data-fav="top">Top</button>
+                <button data-fav="left">Left</button>
+                <button data-fav="right">Right</button>
+                <button data-fav="off">Hidden</button>
+            </div>
         </div>
 
         <div class="section">
@@ -1779,22 +2070,43 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
             </div>
             <div class="row">
                 <label class="checkbox4">
-                    <input type="checkbox" id="fxToggle">
-                    Background animations (turn off if laggy)
+                    <input type="checkbox" id="zoomToggle">
+                    Zoom animation when opening a game
+                </label>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Network</h3>
+            <p>Turning networking off stops chat, notifications, global plays and 🔥 HOT, and your plays aren't added to the global counter. The page reloads.</p>
+            <div class="row">
+                <label class="checkbox4">
+                    <input type="checkbox" id="offlineToggle">
+                    Disable networking
                 </label>
             </div>
             <div class="row">
-                <label class="checkbox4">
+                <label class="checkbox4" id="chatToggleLabel">
                     <input type="checkbox" id="chatToggle">
                     Network chat
                 </label>
             </div>
+        </div>
+
+        <div class="section">
+            <h3>Panic</h3>
+            <p>Get off the site fast. The key works anywhere on this page (not inside games).</p>
             <div class="row">
                 <label class="checkbox4">
                     <input type="checkbox" id="panicToggle">
                     Show "leave site quickly" button
                 </label>
             </div>
+            <div class="row">
+                <span style="font-weight:600; font-size:14px;">Panic key</span>
+                <button class="keyBtn" id="panicKeyBtn">None</button>
+            </div>
+            <input class="field" id="panicUrl" placeholder="Where to go (default: Google Classroom)" style="margin-top:8px;">
         </div>
 
         <div class="section">
@@ -1885,8 +2197,16 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
 <p class="invis">securly</p>
 <p class="invis">go guardian</p>
 
-<div class="games" id="games"></div>
-<div class="empty" id="empty">No games found 😢</div>
+<div class="library noFavs" id="library">
+    <section class="favPanel" id="favPanel" aria-label="Favourites">
+        <div class="favHead"><h2>⭐ Favourites</h2><span id="favCount"></span></div>
+        <div class="favList" id="favList"></div>
+    </section>
+    <div>
+        <div class="games" id="games"></div>
+        <div class="empty" id="empty">No games found 😢</div>
+    </div>
+</div>
 
 </main>
 
@@ -1926,7 +2246,7 @@ if(localStorage.getItem("chatOn") === "false") document.documentElement.classLis
     </form>
 </div>
 
-<div class="classroomBtn" id="classroombutton" onclick="window.location='https://classroom.google.com/'">
+<div class="classroomBtn" id="classroombutton">
 leave site quickly
 </div>
 
@@ -2913,6 +3233,7 @@ card.innerHTML=`
 <div class="playCount${plays ? " played" : ""}">Your plays: ${plays}</div>
 <div class="hotTag">🔥 HOT</div>
 <div class="playIcon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div>
+<button class="favBtn" aria-label="Favourite" title="Favourite">☆</button>
 </div>
 <div class="gameInfo">
 <div class="gameTitle"></div>
@@ -2925,6 +3246,71 @@ card.querySelector(".gameTitle").textContent=name
 container.appendChild(card)
 
 })
+
+
+/* FAVOURITES */
+
+const library = document.getElementById("library")
+const favList = document.getElementById("favList")
+const favCount = document.getElementById("favCount")
+const favSeg = document.getElementById("favSeg")
+
+let favourites = []
+try { favourites = JSON.parse(localStorage.getItem("favourites") || "[]") } catch {}
+
+const gameById = new Map(games.map(g => [g[1], g]))
+favourites = favourites.filter(id => gameById.has(id))
+
+function cardFor(id){
+    return container.querySelector(`.game[data-id="${CSS.escape(id)}"]`)
+}
+
+function renderFavourites(){
+    favList.innerHTML = ""
+    favourites.forEach(id => {
+        const card = cardFor(id)
+        const item = document.createElement("a")
+        item.className = "favItem gameLink"
+        item.dataset.id = id
+        item.href = card.href
+        item.innerHTML = `
+<div class="thumb"><img src="./assets/${id}.png?v=3" alt="" onload="this.classList.add('loaded')" onerror="this.style.visibility='hidden'"></div>
+<span class="gameTitle"></span>
+<button class="favBtn on" aria-label="Remove from favourites" title="Remove from favourites">★</button>`
+        item.querySelector(".gameTitle").textContent = card.querySelector(".gameTitle").textContent
+        favList.appendChild(item)
+    })
+    favCount.textContent = favourites.length ? `${favourites.length} game${favourites.length === 1 ? "" : "s"}` : ""
+    library.classList.toggle("noFavs", favourites.length === 0)
+
+    container.querySelectorAll(".game").forEach(card => {
+        const on = favourites.includes(card.dataset.id)
+        const btn = card.querySelector(".favBtn")
+        btn.classList.toggle("on", on)
+        btn.textContent = on ? "★" : "☆"
+        btn.title = on ? "Remove from favourites" : "Favourite"
+    })
+}
+
+function toggleFavourite(id, btn){
+    favourites = favourites.includes(id) ? favourites.filter(f => f !== id) : [...favourites, id]
+    localStorage.setItem("favourites", JSON.stringify(favourites))
+    renderFavourites()
+    const cardBtn = cardFor(id).querySelector(".favBtn")
+    cardBtn.classList.remove("pop")
+    void cardBtn.offsetWidth
+    cardBtn.classList.add("pop")
+}
+
+function setFavPosition(pos){
+    library.dataset.fav = pos
+    localStorage.setItem("favPosition", pos)
+    favSeg.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.fav === pos))
+}
+
+favSeg.querySelectorAll("button").forEach(b => b.onclick = () => setFavPosition(b.dataset.fav))
+setFavPosition(localStorage.getItem("favPosition") || "top")
+renderFavourites()
 
 
 /* SORTING + GLOBAL STATS */
@@ -2989,9 +3375,19 @@ async function loadStats(){
     if (sortSelect.value !== "yours" && sortSelect.value !== "az") sortGames()
 }
 
-loadStats().catch(() => {})
+if (OFFLINE) {
+    // global sorts make no sense without stats
+    sortSelect.querySelectorAll('option[value="global"], option[value="hot"]').forEach(o => o.disabled = true)
+    if (sortSelect.value === "global" || sortSelect.value === "hot") {
+        sortSelect.value = "yours"
+        sortGames()
+    }
+} else {
+    loadStats().catch(() => {})
+}
 
 function countGlobalPlay(id){
+    if (OFFLINE) return
     const body = new Blob([JSON.stringify({ id, cid: chatCid })], { type: "text/plain" })
     // sendBeacon still gets sent even though the page is navigating away
     if (!(navigator.sendBeacon && navigator.sendBeacon(`${STATS_URL}/play`, body))) {
@@ -3180,6 +3576,10 @@ function launchZoomInTab(win, link, iframe){
     setTimeout(close, 8000) // don't cover the game forever if load never fires
 }
 
+function noZoom(){
+    return reduceMotion || localStorage.getItem("launchZoom") === "false"
+}
+
 // coming back with the back button: drop any leftover launcher
 window.addEventListener("pageshow", () => {
     document.querySelectorAll(".launcher").forEach(el => el.remove())
@@ -3189,18 +3589,27 @@ window.addEventListener("pageshow", () => {
 /* TRACK PLAYS + TRUE ABOUT:BLANK */
 
 document.addEventListener("click", (e) => {
+  // star button sits inside the game link, so handle it first
+  const favBtn = e.target.closest(".favBtn");
+  if (favBtn) {
+    e.preventDefault();
+    toggleFavourite(favBtn.closest("[data-id]").dataset.id);
+    return;
+  }
+
   const link = e.target.closest(".gameLink");
   if (!link) return;
 
   const id = link.dataset.id;
 
-  // track plays
+  // track plays (on the main card, even when clicked from favourites)
+  const card = cardFor(id);
   let plays = Number(localStorage.getItem("plays_" + id)) || 0;
   plays++;
   localStorage.setItem("plays_" + id, plays);
-  link.dataset.plays = plays;
-  link.querySelector(".playCount").innerText = `Your plays: ${plays}`;
-  link.querySelector(".playCount").classList.add("played");
+  card.dataset.plays = plays;
+  card.querySelector(".playCount").innerText = `Your plays: ${plays}`;
+  card.querySelector(".playCount").classList.add("played");
   countGlobalPlay(id);
 
   // let ctrl/cmd/shift/middle clicks open normally
@@ -3212,7 +3621,7 @@ document.addEventListener("click", (e) => {
   const useAB = localStorage.getItem("aboutBlank") === "true";
 
   if (!useAB) {
-    if (reduceMotion) { location.href = url; return; }
+    if (noZoom()) { location.href = url; return; }
     launchZoom(link);
     setTimeout(() => location.href = url, 650);
     return;
@@ -3234,7 +3643,7 @@ document.addEventListener("click", (e) => {
 
   win.document.body.appendChild(iframe);
 
-  if (!reduceMotion) launchZoomInTab(win, link, iframe);
+  if (!noZoom()) launchZoomInTab(win, link, iframe);
 
   // stealth: use the same disguise as this tab
   const cloak = getCloak();
@@ -3342,6 +3751,52 @@ panicToggle.onchange = () => {
     localStorage.setItem("panicButton", panicToggle.checked);
     classroombutton.style.display = panicToggle.checked ? "flex" : "none";
 };
+
+const panicKeyBtn = document.getElementById("panicKeyBtn");
+const panicUrlField = document.getElementById("panicUrl");
+let listeningForKey = false;
+
+function panic(){
+    let url = (localStorage.getItem("panicUrl") || "").trim() || "https://classroom.google.com/";
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    location.replace(url);
+}
+
+classroombutton.onclick = panic;
+
+function showPanicKey(){
+    const key = localStorage.getItem("panicKey");
+    panicKeyBtn.textContent = key ? (key === " " ? "Space" : key) : "None";
+}
+
+panicKeyBtn.onclick = () => {
+    listeningForKey = true;
+    panicKeyBtn.classList.add("listening");
+    panicKeyBtn.textContent = "Press a key…";
+};
+
+panicUrlField.value = localStorage.getItem("panicUrl") || "";
+panicUrlField.oninput = () => localStorage.setItem("panicUrl", panicUrlField.value);
+
+document.addEventListener("keydown", (e) => {
+    if (listeningForKey) {
+        e.preventDefault();
+        listeningForKey = false;
+        panicKeyBtn.classList.remove("listening");
+        // Escape / Backspace clear the key
+        if (e.key === "Escape" || e.key === "Backspace") localStorage.removeItem("panicKey");
+        else localStorage.setItem("panicKey", e.key);
+        showPanicKey();
+        return;
+    }
+    const key = localStorage.getItem("panicKey");
+    if (!key || e.key !== key) return;
+    // don't fire while typing in a box
+    if (e.target.closest("input, textarea, [contenteditable]")) return;
+    panic();
+}, true);
+
+showPanicKey();
 
 /* CHANGE TAB FOR ?icon=classroom */
 if (params.get("icon") === "classroom") {
@@ -3506,6 +3961,27 @@ window.addEventListener("pointermove", (e) => {
     })
 })
 
+const sizeSeg = document.getElementById("sizeSeg")
+function setCardSize(size){
+    document.documentElement.dataset.size = size
+    localStorage.setItem("cardSize", size)
+    sizeSeg.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.size === size))
+}
+sizeSeg.querySelectorAll("button").forEach(b => b.onclick = () => setCardSize(b.dataset.size))
+setCardSize(document.documentElement.dataset.size)
+
+const zoomToggle = document.getElementById("zoomToggle")
+zoomToggle.checked = localStorage.getItem("launchZoom") !== "false"
+zoomToggle.onchange = () => localStorage.setItem("launchZoom", zoomToggle.checked)
+
+const offlineToggle = document.getElementById("offlineToggle")
+offlineToggle.checked = OFFLINE
+offlineToggle.onchange = () => {
+    localStorage.setItem("offline", offlineToggle.checked)
+    location.reload()
+}
+if (OFFLINE) document.getElementById("chatToggleLabel").classList.add("disabled")
+
 fxToggle.checked = localStorage.getItem("bgFx") !== "false"
 fxToggle.onchange = () => {
     localStorage.setItem("bgFx", fxToggle.checked)
@@ -3622,7 +4098,7 @@ const TOUR_STEPS = [
     {
         target: () => [...document.querySelectorAll(".game")].find(g => g.style.display !== "none"),
         title: "Play a game",
-        text: "Click any game to play. Each card shows your plays, global plays from everyone, and a 🔥 HOT tag on the most played games today. Games open in an about:blank tab so they stay out of your history."
+        text: "Click any game to play. Tap the ☆ to favourite it so it shows up at the top. Cards also show your plays, global plays, and a 🔥 HOT tag on today's most played games."
     },
     {
         target: () => document.getElementById("settingsBtn"),
@@ -4003,7 +4479,7 @@ chatToggle.onchange = () => {
     }
 }
 
-if (chatToggle.checked) chatConnect()
+if (chatToggle.checked && !OFFLINE) chatConnect()
 
 
 /* NOTIFICATIONS (DISCORD STYLE) */
@@ -4082,7 +4558,7 @@ function renderNotifications(notifs) {
 }
 
 // initial + refresh
-loadNotifications().catch(() => {});
+if (!OFFLINE) loadNotifications().catch(() => {});
 </script>
 <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2182964775239262"
      crossorigin="anonymous"></script> -->
