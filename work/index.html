@@ -1600,89 +1600,6 @@ html.nofx .spotlight{
     to{ opacity:1; transform:none; }
 }
 
-/* LAUNCH ZOOM */
-
-.launcher{
-    position:fixed;
-    z-index:2000;
-    overflow:hidden;
-    background:#000 center/cover no-repeat;
-    border-radius:var(--radius);
-    box-shadow:0 30px 80px rgba(0,0,0,0.6);
-    transition:
-        top 0.55s cubic-bezier(.7,0,.2,1),
-        left 0.55s cubic-bezier(.7,0,.2,1),
-        width 0.55s cubic-bezier(.7,0,.2,1),
-        height 0.55s cubic-bezier(.7,0,.2,1),
-        border-radius 0.55s,
-        opacity 0.35s;
-}
-
-.launcher::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:
-        radial-gradient(circle at 50% 50%, transparent, rgba(0,0,0,0.85) 75%),
-        color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.45));
-    opacity:0;
-    transition:opacity 0.4s 0.2s;
-}
-
-.launcher.open::before{
-    opacity:1;
-}
-
-.launchText{
-    position:absolute;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:16px;
-    color:white;
-    text-align:center;
-    padding:20px;
-    opacity:0;
-    transform:scale(0.9);
-    transition:0.35s 0.3s;
-}
-
-.launcher.open .launchText{
-    opacity:1;
-    transform:none;
-}
-
-.launchText b{
-    font-size:clamp(22px, 4vw, 38px);
-    font-weight:800;
-    letter-spacing:-0.5px;
-    text-shadow:0 4px 20px rgba(0,0,0,0.6);
-}
-
-.launchText span{
-    opacity:0.8;
-    font-size:14px;
-}
-
-.spinner{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    border:4px solid rgba(255,255,255,0.2);
-    border-top-color:white;
-    animation:spin 0.8s linear infinite;
-}
-
-@keyframes spin{
-    to{ transform:rotate(360deg); }
-}
-
-.launcher.closing{
-    opacity:0;
-}
-
 @media (prefers-reduced-motion: reduce){
     .bgFx *, .hero::before, .brandDot, .game.in{
         animation:none !important;
@@ -3117,12 +3034,101 @@ if ("IntersectionObserver" in window && !reduceMotion) {
 
 /* LAUNCH ZOOM (thumbnail grows to fill the screen) */
 
-function launchZoom(link){
+// shared with the about:blank tab, which doesn't have this page's stylesheet
+const LAUNCH_CSS = `
+.launcher{
+    position:fixed;
+    z-index:2000;
+    overflow:hidden;
+    background:#000 center/cover no-repeat;
+    border-radius:var(--radius);
+    box-shadow:0 30px 80px rgba(0,0,0,0.6);
+    transition:
+        top 0.55s cubic-bezier(.7,0,.2,1),
+        left 0.55s cubic-bezier(.7,0,.2,1),
+        width 0.55s cubic-bezier(.7,0,.2,1),
+        height 0.55s cubic-bezier(.7,0,.2,1),
+        border-radius 0.55s,
+        opacity 0.35s;
+}
+
+.launcher::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        radial-gradient(circle at 50% 50%, transparent, rgba(0,0,0,0.85) 75%),
+        color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.45));
+    opacity:0;
+    transition:opacity 0.4s 0.2s;
+}
+
+.launcher.open::before{
+    opacity:1;
+}
+
+.launchText{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    color:white;
+    text-align:center;
+    padding:20px;
+    opacity:0;
+    transform:scale(0.9);
+    transition:0.35s 0.3s;
+}
+
+.launcher.open .launchText{
+    opacity:1;
+    transform:none;
+}
+
+.launchText b{
+    font-size:clamp(22px, 4vw, 38px);
+    font-weight:800;
+    letter-spacing:-0.5px;
+    text-shadow:0 4px 20px rgba(0,0,0,0.6);
+}
+
+.launchText span{
+    opacity:0.8;
+    font-size:14px;
+}
+
+.spinner{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,0.2);
+    border-top-color:white;
+    animation:spin 0.8s linear infinite;
+}
+
+@keyframes spin{
+    to{ transform:rotate(360deg); }
+}
+
+.launcher.closing{
+    opacity:0;
+}
+`
+
+const launchStyle = document.createElement("style")
+launchStyle.textContent = LAUNCH_CSS
+document.head.appendChild(launchStyle)
+
+function launchZoom(link, win = window){
+    const doc = win.document
     const thumb = link.querySelector(".thumb")
     const r = thumb.getBoundingClientRect()
     const img = thumb.querySelector("img")
 
-    const el = document.createElement("div")
+    const el = doc.createElement("div")
     el.className = "launcher"
     el.style.top = r.top + "px"
     el.style.left = r.left + "px"
@@ -3132,13 +3138,14 @@ function launchZoom(link){
 
     el.innerHTML = `<div class="launchText"><div class="spinner"></div><b></b><span>Loading game…</span></div>`
     el.querySelector("b").textContent = link.querySelector(".gameTitle").textContent
-    document.body.appendChild(el)
+    doc.body.appendChild(el)
 
     el.getBoundingClientRect() // force layout so the transition runs
     el.style.top = "0px"
     el.style.left = "0px"
-    el.style.width = document.documentElement.clientWidth + "px"
-    el.style.height = window.innerHeight + "px"
+    // a brand new tab may not know its size yet, so use viewport units there
+    el.style.width = win === window ? doc.documentElement.clientWidth + "px" : "100vw"
+    el.style.height = win === window ? win.innerHeight + "px" : "100vh"
     el.style.borderRadius = "0px"
     el.classList.add("open")
 
@@ -3148,6 +3155,29 @@ function launchZoom(link){
 function closeLauncher(el){
     el.classList.add("closing")
     setTimeout(() => el.remove(), 400)
+}
+
+// the about:blank tab comes to the front straight away, so the zoom plays in there
+// and fades out once the game has loaded (at least long enough to see it)
+function launchZoomInTab(win, link, iframe){
+    const doc = win.document
+    const rootStyle = getComputedStyle(document.documentElement)
+    const style = doc.createElement("style")
+    style.textContent = `:root{ --accent:${rootStyle.getPropertyValue("--accent")}; --radius:14px; }
+        body{ margin:0; background:#0e1015; font-family:system-ui,sans-serif; overflow:hidden; }
+        ${LAUNCH_CSS}`
+    doc.head.appendChild(style)
+
+    const el = launchZoom(link, win)
+    const shownAt = Date.now()
+    let closed = false
+    const close = () => {
+        if (closed) return
+        closed = true
+        setTimeout(() => closeLauncher(el), Math.max(0, 1200 - (Date.now() - shownAt)))
+    }
+    iframe.addEventListener("load", close)
+    setTimeout(close, 8000) // don't cover the game forever if load never fires
 }
 
 // coming back with the back button: drop any leftover launcher
@@ -3192,11 +3222,6 @@ document.addEventListener("click", (e) => {
   const win = window.open("about:blank", "_blank");
   if (!win) { location.href = url; return; }
 
-  if (!reduceMotion) {
-    const el = launchZoom(link);
-    setTimeout(() => closeLauncher(el), 1100);
-  }
-
   // wait for tab to be ready
   win.document.body.style.margin = "0";
 
@@ -3208,6 +3233,8 @@ document.addEventListener("click", (e) => {
   iframe.allow = "fullscreen; gamepad; autoplay";
 
   win.document.body.appendChild(iframe);
+
+  if (!reduceMotion) launchZoomInTab(win, link, iframe);
 
   // stealth: use the same disguise as this tab
   const cloak = getCloak();
