@@ -554,8 +554,68 @@ main{
     pointer-events:none;
 }
 
-.playCount.hot{
+.playCount.played{
     background:var(--accent);
+}
+
+.hotTag{
+    position:absolute;
+    top:8px;
+    right:8px;
+    z-index:1;
+    display:none;
+    padding:4px 8px;
+    border-radius:999px;
+    background:linear-gradient(135deg, #ff7a18, #ff2d55);
+    color:white;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:0.4px;
+    box-shadow:0 4px 14px rgba(255,60,60,0.45);
+    pointer-events:none;
+    animation:hotPulse 1.8s ease-in-out infinite;
+}
+
+.game.isHot .hotTag{
+    display:block;
+}
+
+.game.isHot{
+    border-color:color-mix(in srgb, #ff4d3d 45%, var(--border));
+}
+
+@keyframes hotPulse{
+    50%{ transform:scale(1.08); box-shadow:0 4px 20px rgba(255,60,60,0.7); }
+}
+
+.globalPlays{
+    display:none;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--muted);
+    margin-top:-2px;
+}
+
+.statsLoaded .globalPlays{
+    display:block;
+}
+
+.sortSelect{
+    appearance:none;
+    -webkit-appearance:none;
+    padding:8px 32px 8px 14px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.22);
+    background:rgba(255,255,255,0.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+    color:white;
+    font:inherit;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.sortSelect option{
+    color:#111;
 }
 
 .gameInfo{
@@ -578,6 +638,7 @@ main{
 
 .tags{
     display:flex;
+    align-items:center;
     gap:5px;
     margin-top:auto;
 }
@@ -1863,13 +1924,19 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
 <div class="hero">
     <div>
         <h1>Playables!</h1>
-        <p class="heroSub">Pick a game and start playing. Your most played float to the top.</p>
+        <p class="heroSub">Pick a game and start playing. Sort by your plays, global plays or what's 🔥 hot.</p>
         <div class="count" id="count"></div>
     </div>
     <div class="chips">
         <button class="chip active" id="allbutton">All games</button>
         <button class="chip" id="pcbutton">💻 PC</button>
         <button class="chip" id="tabletbutton">📱 Mobile</button>
+        <select class="sortSelect" id="sortSelect" aria-label="Sort games">
+            <option value="yours">Sort: Your plays</option>
+            <option value="global">Sort: Most played globally</option>
+            <option value="hot">Sort: 🔥 Hot right now</option>
+            <option value="az">Sort: A–Z</option>
+        </select>
     </div>
 </div>
 
@@ -2901,9 +2968,6 @@ function getPlays(id){
     return Number(localStorage.getItem("plays_"+id)) || 0
 }
 
-// sort by most played
-games.sort((a,b)=>getPlays(b[1]) - getPlays(a[1]))
-
 games.forEach(g=>{
 
 const plays = getPlays(g[1])
@@ -2920,16 +2984,22 @@ card.dataset.id=g[1]
 card.dataset.name=name.toLowerCase()
 card.dataset.pc=pc || !tagged
 card.dataset.mobile=mobile || !tagged
+card.dataset.order=container.children.length
+card.dataset.plays=plays
+card.dataset.global=0
+card.dataset.hot=0
 card.href=`https://native.beer/work/${g[1]}`
 
 card.innerHTML=`
 <div class="thumb">
 <img src="./assets/${g[1]}.png?v=3" loading="lazy" alt="" onload="this.classList.add('loaded')" onerror="this.style.visibility='hidden'">
-<div class="playCount${plays ? " hot" : ""}">${plays} plays</div>
+<div class="playCount${plays ? " played" : ""}">Your plays: ${plays}</div>
+<div class="hotTag">🔥 HOT</div>
 <div class="playIcon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></div>
 </div>
 <div class="gameInfo">
 <div class="gameTitle"></div>
+<div class="globalPlays">🌍 0 global plays</div>
 <div class="tags">${pc ? '<span class="tag">PC</span>' : ""}${mobile ? '<span class="tag">Mobile</span>' : ""}</div>
 </div>
 `
@@ -2938,6 +3008,79 @@ card.querySelector(".gameTitle").textContent=name
 container.appendChild(card)
 
 })
+
+
+/* SORTING + GLOBAL STATS */
+
+const STATS_URL = location.hostname === "localhost" ? "http://localhost:8787" : "https://chatapp.native.beer"
+const sortSelect = document.getElementById("sortSelect")
+
+function shortNum(n){
+    if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, "") + "m"
+    if (n >= 1e3) return (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, "") + "k"
+    return String(n)
+}
+
+function plural(n, word){
+    return `${shortNum(n)} ${word}${n === 1 ? "" : "s"}`
+}
+
+function sortGames(){
+    const mode = sortSelect.value
+    const num = (card, key) => Number(card.dataset[key])
+    const cards = [...container.children]
+
+    cards.sort((a, b) => {
+        if (mode === "az") return a.dataset.name.localeCompare(b.dataset.name)
+        if (mode === "hot") {
+            // hot games first (by plays in last 24h), then everything else by global plays
+            const h = num(b, "hot") - num(a, "hot")
+            if (h) return h
+        }
+        if (mode === "global" || mode === "hot") {
+            const g = num(b, "global") - num(a, "global")
+            if (g) return g
+        }
+        return num(b, "plays") - num(a, "plays") || num(a, "order") - num(b, "order")
+    })
+
+    cards.forEach(card => container.appendChild(card))
+}
+
+sortSelect.value = localStorage.getItem("sort") || "yours"
+sortSelect.onchange = () => {
+    localStorage.setItem("sort", sortSelect.value)
+    sortGames()
+    window.scrollTo({ top: document.querySelector(".hero").offsetTop + document.querySelector(".hero").offsetHeight - 60, behavior: "smooth" })
+}
+sortGames()
+
+async function loadStats(){
+    const res = await fetch(`${STATS_URL}/stats`)
+    const stats = await res.json()
+    const hot = new Map(stats.hot.map(h => [h.id, h.n]))
+
+    container.querySelectorAll(".game").forEach(card => {
+        const n = stats.totals[card.dataset.id] || 0
+        card.dataset.global = n
+        card.querySelector(".globalPlays").textContent = `🌍 ${plural(n, "global play")}`
+        card.dataset.hot = hot.get(card.dataset.id) || 0
+        card.classList.toggle("isHot", hot.has(card.dataset.id))
+    })
+
+    container.classList.add("statsLoaded")
+    if (sortSelect.value !== "yours" && sortSelect.value !== "az") sortGames()
+}
+
+loadStats().catch(() => {})
+
+function countGlobalPlay(id){
+    const body = new Blob([JSON.stringify({ id, cid: chatCid })], { type: "text/plain" })
+    // sendBeacon still gets sent even though the page is navigating away
+    if (!(navigator.sendBeacon && navigator.sendBeacon(`${STATS_URL}/play`, body))) {
+        fetch(`${STATS_URL}/play`, { method: "POST", body, keepalive: true }).catch(() => {})
+    }
+}
 
 
 /* CARD ENTRANCE (fade up as cards scroll into view) */
@@ -3025,8 +3168,10 @@ document.addEventListener("click", (e) => {
   let plays = Number(localStorage.getItem("plays_" + id)) || 0;
   plays++;
   localStorage.setItem("plays_" + id, plays);
-  link.querySelector(".playCount").innerText = `${plays} plays`;
-  link.querySelector(".playCount").classList.add("hot");
+  link.dataset.plays = plays;
+  link.querySelector(".playCount").innerText = `Your plays: ${plays}`;
+  link.querySelector(".playCount").classList.add("played");
+  countGlobalPlay(id);
 
   // let ctrl/cmd/shift/middle clicks open normally
   if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
@@ -3444,13 +3589,13 @@ const TOUR_STEPS = [
     },
     {
         target: () => document.querySelector(".hero .chips"),
-        title: "Filter by device",
-        text: "Only show games that work on PC or on mobile."
+        title: "Filter and sort",
+        text: "Only show games that work on PC or mobile, and sort by your plays, global plays, or what's hot right now."
     },
     {
         target: () => [...document.querySelectorAll(".game")].find(g => g.style.display !== "none"),
         title: "Play a game",
-        text: "Click any game to play. The ones you play most move to the top. Games open in an about:blank tab by default so they stay out of your history."
+        text: "Click any game to play. Each card shows your plays, global plays from everyone, and a 🔥 HOT tag on the most played games today. Games open in an about:blank tab so they stay out of your history."
     },
     {
         target: () => document.getElementById("settingsBtn"),

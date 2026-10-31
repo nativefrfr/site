@@ -43,8 +43,10 @@ async function hash(text) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url)
+
+    if (url.pathname === "/stats" || url.pathname === "/play") return handleStats(request, env, ctx)
 
     if (url.pathname !== "/ws") return new Response("native chat", { status: 200 })
 
@@ -222,5 +224,116 @@ export class ChatRoom {
         ws.send(msg)
       } catch {}
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Global play counts
+// POST /play  (sendBeacon, body = {"id": "...", "cid": "..."})  -> counts a play
+// GET  /stats -> { totals: { id: plays }, hot: [{ id, n }] }   (hot = most played in last 24h)
+
+const HOT_COUNT = 10
+const PLAY_DEDUPE_MS = 10 * 60 * 1000  // same browser + same game only counts once per 10 min
+const PLAYS_PER_IP_HOUR = 120          // stops one network spamming the counts
+
+async function handleStats(request, env, ctx) {
+  const url = new URL(request.url)
+  const stub = env.STATS.get(env.STATS.idFromName("global"))
+
+  if (url.pathname === "/play") {
+    if (request.method !== "POST") return new Response("method not allowed", { status: 405 })
+    const origin = request.headers.get("Origin") || ""
+    const allowed = (env.ALLOWED_ORIGINS || "").split(",").map(s => s.trim())
+    if (!allowed.includes(origin)) return new Response("forbidden", { status: 403 })
+
+    const body = await request.text()
+    const ip = request.headers.get("CF-Connecting-IP") || "local"
+    const res = await stub.fetch("https://stats/play", {
+      method: "POST",
+      body,
+      headers: { "X-IP": await hash("native-stats:" + ip) }
+    })
+    return new Response(res.body, { status: res.status, headers: { "Access-Control-Allow-Origin": origin } })
+  }
+
+  // GET /stats, cached at the edge for a minute so the DO isn't hit on every page load
+  const cache = caches.default
+  const cacheKey = new Request(url.origin + "/stats")
+  let res = await cache.match(cacheKey)
+  if (!res) {
+    const fresh = await stub.fetch("https://stats/stats")
+    res = new Response(fresh.body, {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, max-age=60",
+        "Access-Control-Allow-Origin": "*"
+      }
+    })
+    ctx.waitUntil(cache.put(cacheKey, res.clone()))
+  }
+  return res
+}
+
+export class Stats {
+  constructor(ctx, env) {
+    this.ctx = ctx
+    this.sql = ctx.storage.sql
+    this.sql.exec("CREATE TABLE IF NOT EXISTS totals (id TEXT PRIMARY KEY, n INTEGER NOT NULL)")
+    this.sql.exec("CREATE TABLE IF NOT EXISTS hourly (id TEXT NOT NULL, hour INTEGER NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (id, hour))")
+    this.recent = new Map()   // cid|id -> last counted time
+    this.ipHits = new Map()   // ip -> { hour, n }
+    this.lastPrune = 0
+  }
+
+  async fetch(request) {
+    const url = new URL(request.url)
+
+    if (url.pathname === "/play") {
+      let data
+      try {
+        data = JSON.parse(await request.text())
+      } catch {
+        return new Response("bad request", { status: 400 })
+      }
+      const id = String(data.id || "").slice(0, 100)
+      const cid = String(data.cid || "").slice(0, 64)
+      if (!id) return new Response("bad request", { status: 400 })
+
+      const now = Date.now()
+      const hour = Math.floor(now / 3600000)
+
+      const ip = request.headers.get("X-IP") || ""
+      const hits = this.ipHits.get(ip)
+      if (hits && hits.hour === hour && hits.n >= PLAYS_PER_IP_HOUR) return new Response("slow down", { status: 429 })
+      this.ipHits.set(ip, { hour, n: hits && hits.hour === hour ? hits.n + 1 : 1 })
+
+      const key = cid + "|" + id
+      if (cid && now - (this.recent.get(key) || 0) < PLAY_DEDUPE_MS) return new Response("ok")
+      this.recent.set(key, now)
+
+      this.sql.exec("INSERT INTO totals (id, n) VALUES (?, 1) ON CONFLICT (id) DO UPDATE SET n = n + 1", id)
+      this.sql.exec("INSERT INTO hourly (id, hour, n) VALUES (?, ?, 1) ON CONFLICT (id, hour) DO UPDATE SET n = n + 1", id, hour)
+
+      // tidy up once an hour: old hourly rows and the in-memory maps
+      if (now - this.lastPrune > 3600000) {
+        this.lastPrune = now
+        this.sql.exec("DELETE FROM hourly WHERE hour < ?", hour - 48)
+        for (const [k, t] of this.recent) if (now - t > PLAY_DEDUPE_MS) this.recent.delete(k)
+        for (const [k, v] of this.ipHits) if (v.hour !== hour) this.ipHits.delete(k)
+      }
+
+      return new Response("ok")
+    }
+
+    // GET stats
+    const hour = Math.floor(Date.now() / 3600000)
+    const totals = {}
+    for (const row of this.sql.exec("SELECT id, n FROM totals")) totals[row.id] = row.n
+    const hot = [...this.sql.exec(
+      "SELECT id, SUM(n) AS n FROM hourly WHERE hour > ? GROUP BY id ORDER BY n DESC LIMIT ?",
+      hour - 24, HOT_COUNT
+    )].map(row => ({ id: row.id, n: row.n }))
+
+    return new Response(JSON.stringify({ totals, hot }), { headers: { "Content-Type": "application/json" } })
   }
 }
