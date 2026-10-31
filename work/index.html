@@ -925,6 +925,136 @@ main{
     background:#c73338;
 }
 
+/* TOUR */
+
+.tourShade{
+    position:fixed;
+    inset:0;
+    z-index:3000;
+    background:transparent;
+}
+
+.tourHole{
+    position:fixed;
+    z-index:3001;
+    border-radius:16px;
+    box-shadow:0 0 0 9999px rgba(5,6,10,0.72), 0 0 0 3px var(--accent), 0 0 30px color-mix(in srgb, var(--accent) 60%, transparent);
+    pointer-events:none;
+    transition:top 0.35s cubic-bezier(.2,.8,.2,1), left 0.35s cubic-bezier(.2,.8,.2,1), width 0.35s cubic-bezier(.2,.8,.2,1), height 0.35s cubic-bezier(.2,.8,.2,1), opacity 0.25s;
+}
+
+/* no target: hole shrinks to the centre and just dims the page */
+.tourHole.center{
+    box-shadow:0 0 0 9999px rgba(5,6,10,0.72);
+}
+
+.tourCard{
+    position:fixed;
+    z-index:3002;
+    width:min(330px, calc(100vw - 32px));
+    padding:18px 18px 14px;
+    border-radius:18px;
+    background:var(--surface);
+    color:var(--text);
+    border:1px solid var(--border);
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    transition:top 0.35s cubic-bezier(.2,.8,.2,1), left 0.35s cubic-bezier(.2,.8,.2,1), opacity 0.2s;
+    animation:tourPop 0.3s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes tourPop{
+    from{ opacity:0; transform:scale(0.92); }
+}
+
+.tourCard h4{
+    margin:0 70px 6px 0;
+    font-size:17px;
+}
+
+.tourCard p{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+}
+
+.tourFoot{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:16px;
+}
+
+.tourDots{
+    display:flex;
+    gap:5px;
+    margin-right:auto;
+}
+
+.tourDots span{
+    width:7px;
+    height:7px;
+    border-radius:999px;
+    background:var(--border);
+    transition:0.2s;
+}
+
+.tourDots span.on{
+    width:18px;
+    background:var(--accent);
+}
+
+.tourFoot button{
+    padding:8px 14px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text);
+}
+
+.tourFoot .tourNext{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:white;
+}
+
+.tourSkip{
+    position:absolute;
+    top:12px;
+    right:12px;
+    border:none;
+    background:none;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.tourSkip:hover{
+    color:var(--text);
+}
+
+.ghostBtn{
+    width:100%;
+    padding:11px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text);
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    transition:0.15s;
+}
+
+.ghostBtn:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+}
+
 /* CHAT */
 
 .chatFab{
@@ -1687,6 +1817,12 @@ if(localStorage.getItem("bgFx") === "false") document.documentElement.classList.
                     Show "leave site quickly" button
                 </label>
             </div>
+        </div>
+
+        <div class="section">
+            <h3>Help</h3>
+            <p>New here or forgot where things are?</p>
+            <button class="ghostBtn" id="replayTour">Replay the tour</button>
         </div>
 
         <div class="section">
@@ -3102,6 +3238,9 @@ if (params.get("icon") === "clear") {
 // Show overlay unless this version was already accepted
 if (!skipDisclaimer) {
     overlay.classList.remove("hidden")
+} else if (params.get("icon") !== "admin") {
+    // runs after the rest of the script has loaded
+    setTimeout(() => maybeStartTour(), 700)
 }
 
 // Enable enter button only when checked
@@ -3114,6 +3253,7 @@ enter.onclick = () => {
     overlay.classList.add("hidden")
     agree.checked = false;
     enter.disabled = true;
+    setTimeout(() => maybeStartTour(), 400)
 };
 
 
@@ -3287,6 +3427,198 @@ document.getElementById("clearStorage").onclick=()=>{
     if(!confirm("Clear all local storage? This resets play counts, settings and the disclaimer.")) return
     localStorage.clear()
     location.reload()
+}
+
+
+/* FIRST VISIT TOUR */
+
+const TOUR_STEPS = [
+    {
+        title: "Welcome to Playables! 👋",
+        text: "Here's a quick tour so you know where everything is. Takes about 20 seconds, or skip it any time."
+    },
+    {
+        target: () => document.querySelector(".searchField"),
+        title: "Search",
+        text: `Type to search all ${games.length} games instantly.`
+    },
+    {
+        target: () => document.querySelector(".hero .chips"),
+        title: "Filter by device",
+        text: "Only show games that work on PC or on mobile."
+    },
+    {
+        target: () => [...document.querySelectorAll(".game")].find(g => g.style.display !== "none"),
+        title: "Play a game",
+        text: "Click any game to play. The ones you play most move to the top. Games open in an about:blank tab by default so they stay out of your history."
+    },
+    {
+        target: () => document.getElementById("settingsBtn"),
+        title: "Settings",
+        text: "Disguise the tab (it looks like Google Classroom right now), change colours, turn off animations, or clear your data."
+    },
+    {
+        target: () => document.getElementById("themeBtn"),
+        title: "Light or dark",
+        text: "Quick switch between light and dark mode."
+    },
+    {
+        target: () => document.getElementById("chatFab"),
+        title: "Network chat",
+        text: "Chat with other people on the same network who have the site open. Nothing is saved. Be nice!"
+    },
+    {
+        title: "You're all set! 🎮",
+        text: "You can replay this tour any time from Settings."
+    }
+]
+
+let tourEls = null
+let tourSteps = []
+let tourIndex = 0
+
+function maybeStartTour(){
+    if (localStorage.getItem("tourDone")) return
+
+    // people who have already played something aren't new, don't bother them
+    for (let i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i).startsWith("plays_")) {
+            localStorage.setItem("tourDone", "true")
+            return
+        }
+    }
+
+    startTour()
+}
+
+function startTour(){
+    if (tourEls) return
+    closeSettings()
+    chatCloseFn()
+    window.scrollTo({ top: 0, behavior: "smooth" })
+
+    // leave out steps whose element is hidden (e.g. chat turned off)
+    tourSteps = TOUR_STEPS.filter(step => {
+        if (!step.target) return true
+        const el = step.target()
+        return el && el.getClientRects().length > 0
+    })
+    tourIndex = 0
+
+    const shade = document.createElement("div")
+    shade.className = "tourShade"
+    const hole = document.createElement("div")
+    hole.className = "tourHole center"
+    const card = document.createElement("div")
+    card.className = "tourCard"
+    card.setAttribute("role", "dialog")
+    card.innerHTML = `
+        <button class="tourSkip">Skip tour</button>
+        <h4></h4>
+        <p></p>
+        <div class="tourFoot">
+            <div class="tourDots">${tourSteps.map(() => "<span></span>").join("")}</div>
+            <button class="tourBack">Back</button>
+            <button class="tourNext">Next</button>
+        </div>`
+
+    document.body.append(shade, hole, card)
+    tourEls = { shade, hole, card }
+
+    card.querySelector(".tourSkip").onclick = endTour
+    card.querySelector(".tourBack").onclick = () => showTourStep(tourIndex - 1)
+    card.querySelector(".tourNext").onclick = () => {
+        if (tourIndex === tourSteps.length - 1) endTour()
+        else showTourStep(tourIndex + 1)
+    }
+    shade.onclick = () => card.querySelector(".tourNext").click()
+
+    showTourStep(0)
+}
+
+function showTourStep(i){
+    tourIndex = Math.max(0, Math.min(i, tourSteps.length - 1))
+    const step = tourSteps[tourIndex]
+    const { card } = tourEls
+
+    card.querySelector("h4").textContent = step.title
+    card.querySelector("p").textContent = step.text
+    card.querySelector(".tourBack").style.visibility = tourIndex === 0 ? "hidden" : "visible"
+    card.querySelector(".tourNext").textContent =
+        tourIndex === 0 ? "Start" : tourIndex === tourSteps.length - 1 ? "Let's go!" : "Next"
+    card.querySelectorAll(".tourDots span").forEach((d, n) => d.classList.toggle("on", n === tourIndex))
+
+    const el = step.target && step.target()
+    if (el) {
+        const r = el.getBoundingClientRect()
+        // scroll things that are off screen into view first
+        if (r.top < 70 || r.bottom > innerHeight - 20) {
+            el.scrollIntoView({ block: "center", behavior: "smooth" })
+            setTimeout(positionTour, 450)
+        }
+    }
+    positionTour()
+    card.querySelector(".tourNext").focus({ preventScroll: true })
+}
+
+function positionTour(){
+    if (!tourEls) return
+    const { hole, card } = tourEls
+    const step = tourSteps[tourIndex]
+    const el = step.target && step.target()
+    const cw = card.offsetWidth
+    const ch = card.offsetHeight
+
+    if (!el) {
+        hole.classList.add("center")
+        Object.assign(hole.style, { top: innerHeight / 2 + "px", left: innerWidth / 2 + "px", width: "0px", height: "0px" })
+        card.style.left = (innerWidth - cw) / 2 + "px"
+        card.style.top = (innerHeight - ch) / 2 + "px"
+        return
+    }
+
+    const pad = 8
+    const r = el.getBoundingClientRect()
+    hole.classList.remove("center")
+    Object.assign(hole.style, {
+        top: r.top - pad + "px",
+        left: r.left - pad + "px",
+        width: r.width + pad * 2 + "px",
+        height: r.height + pad * 2 + "px"
+    })
+
+    // card goes below the target if it fits, otherwise above
+    const gap = 16
+    let top = r.bottom + pad + gap
+    if (top + ch > innerHeight - 12) top = r.top - pad - gap - ch
+    top = Math.max(12, Math.min(top, innerHeight - ch - 12))
+    let left = r.left + r.width / 2 - cw / 2
+    left = Math.max(16, Math.min(left, innerWidth - cw - 16))
+
+    card.style.top = top + "px"
+    card.style.left = left + "px"
+}
+
+function endTour(){
+    if (!tourEls) return
+    localStorage.setItem("tourDone", "true")
+    Object.values(tourEls).forEach(el => el.remove())
+    tourEls = null
+}
+
+window.addEventListener("resize", positionTour)
+window.addEventListener("scroll", positionTour, { passive: true })
+
+document.addEventListener("keydown", (e) => {
+    if (!tourEls) return
+    if (e.key === "Escape") endTour()
+    else if (e.key === "ArrowRight") tourEls.card.querySelector(".tourNext").click()
+    else if (e.key === "ArrowLeft" && tourIndex > 0) showTourStep(tourIndex - 1)
+})
+
+document.getElementById("replayTour").onclick = () => {
+    closeSettings()
+    setTimeout(startTour, 300)
 }
 
 
