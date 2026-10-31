@@ -2407,6 +2407,8 @@ if (params.get("icon") == "bypass") {
 else{
 
     games=[
+    // optional third item: a link to open instead of native.beer/work/<id>
+    ['spotify 📱+💻', 'spotify', 'https://grrmondays.native.beer'],
     ['1v1.lol💻', '1v1lol'],
     ['8ball billiards 📱+💻', '8ballbillards'],
     ['A Difficult Game About Climbing 📱+💻', 'adgac'],
@@ -3370,7 +3372,7 @@ card.dataset.order=container.children.length
 card.dataset.plays=plays
 card.dataset.global=0
 card.dataset.hot=0
-card.href=`https://native.beer/work/${g[1]}`
+card.href=g[2] || `https://native.beer/work/${g[1]}`
 
 card.innerHTML=`
 <div class="thumb">
@@ -3976,7 +3978,7 @@ const t = Math.min(1, (now - start) / duration)
 const eased = 1 - Math.pow(1 - t, 3)
 currentCount = Math.round(from + (target - from) * eased)
 
-count.innerHTML = `<span class="show">${currentCount} games</span>`
+count.innerHTML = `<span class="show">${currentCount} game${currentCount === 1 ? "" : "s"}</span>`
 
 if(t < 1) countFrame = requestAnimationFrame(tick)
 }
